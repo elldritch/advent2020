@@ -1,0 +1,68 @@
+cabal-version: 3.0
+name:          advent2020
+version:       0.1.0.0
+build-type:    Simple
+
+common lang
+  build-depends:      base >=4.12 && <4.14
+  default-language:   Haskell2010
+  default-extensions:
+    NoImplicitPrelude
+    Arrows
+    ConstraintKinds
+    DataKinds
+    DefaultSignatures
+    DeriveFunctor
+    DeriveGeneric
+    DuplicateRecordFields
+    FlexibleContexts
+    FlexibleInstances
+    GeneralizedNewtypeDeriving
+    MultiParamTypeClasses
+    NamedFieldPuns
+    OverloadedStrings
+    RecordWildCards
+    ScopedTypeVariables
+    TemplateHaskell
+    TupleSections
+    TypeOperators
+
+  ghc-options:
+    -Wall -Wincomplete-uni-patterns -Wcompat
+    -Wincomplete-record-updates -Wmissing-home-modules
+    -Wmissing-export-lists -Wredundant-constraints
+
+  build-depends:      relude ==0.7.0.0
+
+library
+  import:          lang
+  hs-source-dirs:  src
+
+  -- cabal-fmt: expand src
+  exposed-modules: Advent2020.D1
+  build-depends:
+
+test-suite tests
+  import:         lang
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is:        Main.hs
+
+  -- cabal-fmt: expand test -Main
+  other-modules:  D1Spec
+  build-depends:
+    , advent2020
+    , hspec       ==2.7.1
+
+executable advent2020
+  import:             lang
+  ghc-options:        -threaded -with-rtsopts=-N
+  hs-source-dirs:     cmd/advent2020
+  main-is:            Main.hs
+
+  -- cabal-fmt: expand cmd/advent2020 -Main
+  other-modules:
+  build-tool-depends: hspec-discover:hspec-discover ==2.7.1
+  build-depends:
+    , advent2020
+    , optparse-applicative  ==0.16.1.0
