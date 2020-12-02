@@ -1,44 +1,36 @@
 module Main (main) where
 
 import qualified Advent2020.D1 as D1
-import Options.Applicative (CommandFields, Mod, Parser, ParserInfo, argument, briefDesc, command, execParser, helper, hsubparser, info, metavar, progDesc, str)
+import Options.Applicative (ParserInfo, auto, briefDesc, execParser, helper, info, long, option, progDesc, strOption)
 import Relude
 
-data Day1Puzzles
-  = Day1Part1 FilePath
-  | Day1Part2 FilePath
+data Options = Options
+  { day :: Int,
+    part :: Int,
+    inputFilepath :: FilePath
+  }
   deriving (Show)
 
-newtype PuzzleArgs
-  = Day1 Day1Puzzles
-  deriving (Show)
-
-opts :: ParserInfo PuzzleArgs
+opts :: ParserInfo Options
 opts =
   info
-    (cmds <**> helper)
+    (options <**> helper)
     (briefDesc <> progDesc "Advent 2020 solutions")
   where
-    makeCmd :: String -> Parser t -> String -> Mod CommandFields t
-    makeCmd name parser desc = command name (info parser (briefDesc <> progDesc desc))
-
-    -- TODO: makeDay and makePart combinators for arguments.
-
-    cmds =
-      hsubparser $
-        command
-          "day-1"
-          (info
-            (Day1 <$>
-              hsubparser
-                  (makeCmd "part-1" (Day1Part1 <$> argument str (metavar "FILE")) "Solve day 1 part 1"
-                <> makeCmd "part-2" (Day1Part2 <$> argument str (metavar "FILE")) "Solve day 1 part 2"))
-            (briefDesc <> progDesc "Solve day 1"))
+    options =
+      Options
+        <$> option auto (long "day")
+        <*> option auto (long "part")
+        <*> strOption (long "input_file")
 
 main :: IO ()
 main = do
-  day <- execParser opts
-  case day of
-    Day1 args -> case args of
-      Day1Part1 filepath -> D1.run filepath D1.part1 >>= print
-      Day1Part2 filepath -> D1.run filepath D1.part2 >>= print
+  Options {day, part, inputFilepath} <- execParser opts
+  contents <- readFileText inputFilepath
+
+  print $ case day of
+    1 -> case part of
+      1 -> show $ D1.run contents D1.part1
+      2 -> show $ D1.run contents D1.part2
+      _ -> ("No such part" :: Text)
+    _ -> ("No such puzzle" :: Text)

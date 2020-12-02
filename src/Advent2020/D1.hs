@@ -3,12 +3,11 @@ module Advent2020.D1 (run, part1, part2) where
 import Relude
 import Relude.Unsafe (fromJust, read)
 
-run :: FilePath -> ([Int] -> Int) -> IO Int
-run file runner = do
-  contents <- readFileText file
-  let ls = lines contents
-  let xs = map ((\x -> read x :: Int) . toString) ls
-  return $ runner xs
+run :: Text -> ([Int] -> Int) -> Int
+run contents runner = runner xs
+  where
+    ls = lines contents
+    xs = map ((\x -> read x :: Int) . toString) ls
 
 part1 :: [Int] -> Int
 part1 entries = let (x, y) = fromJust $ find (\(a, b) -> a + b == 2020) (pairs entries) in x * y
