@@ -1,6 +1,6 @@
 module D1Spec (spec) where
 
-import Advent2020.D1 (part2, part1)
+import Advent2020.D1 (part1, part2)
 import Relude
 import Test.Hspec (describe, Spec, it, shouldBe)
 

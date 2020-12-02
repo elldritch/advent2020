@@ -42,6 +42,7 @@ library
   exposed-modules:
     Advent2020.D1
     Advent2020.D2
+    Advent2020.Internal.D2
 
   build-depends:   megaparsec ==9.0.1
 

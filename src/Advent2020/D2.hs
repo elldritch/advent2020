@@ -1,33 +1,9 @@
-module Advent2020.D2 (run, part1, part2, parse, Password (..), errorBundlePretty) where
+module Advent2020.D2 (run, part1, part2) where
 
+import Advent2020.Internal.D2 (Password (..), parse)
 import Relude hiding (max, min, some)
-import Relude.Unsafe (read, (!!))
-import Text.Megaparsec (ParseErrorBundle, Parsec, chunk, errorBundlePretty, manyTill, runParser, some, (<?>))
-import Text.Megaparsec.Char (char, letterChar, newline, numberChar, spaceChar)
-
-data Password = Password
-  { a :: Int,
-    b :: Int,
-    letter :: Char,
-    password :: String
-  }
-  deriving (Show, Eq)
-
-parse :: Text -> Either (ParseErrorBundle Text Void) [Password]
-parse = runParser (some parser) ""
-
-type Parser = Parsec Void Text
-
-parser :: Parser Password
-parser = do
-  a' <- numberChar `manyTill` char '-' <?> "a"
-  let a :: Int = read a'
-  b' <- numberChar `manyTill` spaceChar <?> "b"
-  let b :: Int = read b'
-  letter <- letterChar <?> "letter"
-  _ <- chunk ": "
-  password <- letterChar `manyTill` newline <?> "password"
-  return Password {..}
+import Relude.Unsafe ((!!))
+import Text.Megaparsec (errorBundlePretty)
 
 run :: Text -> (Password -> Bool) -> Int
 run contents isValid = sum $ map fromEnum valids
