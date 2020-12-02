@@ -39,8 +39,11 @@ library
   hs-source-dirs:  src
 
   -- cabal-fmt: expand src
-  exposed-modules: Advent2020.D1
-  build-depends:
+  exposed-modules:
+    Advent2020.D1
+    Advent2020.D2
+
+  build-depends:   megaparsec ==9.0.1
 
 test-suite tests
   import:         lang
@@ -49,7 +52,10 @@ test-suite tests
   main-is:        Main.hs
 
   -- cabal-fmt: expand test -Main
-  other-modules:  D1Spec
+  other-modules:
+    D1Spec
+    D2Spec
+
   build-depends:
     , advent2020
     , hspec       ==2.7.1
