@@ -2,26 +2,31 @@ module Advent2020.D2 (run, part1, part2) where
 
 import Advent2020.Internal.D2 (Password (..), parse)
 import Relude hiding (max, min, some)
-import Relude.Unsafe ((!!))
 import Text.Megaparsec (errorBundlePretty)
+import Advent2020.Internal (gather)
 
-run :: Text -> (Password -> Bool) -> Int
-run contents isValid = sum $ map fromEnum valids
-  where
-    passwords = case parse contents of
-      Right ps -> ps
-      Left err -> error $ toText $ errorBundlePretty err
-    valids = map isValid passwords
+run :: Text -> (Password -> Either Text Bool) -> Either [Text] Int
+run contents isValid = do
+  passwords <- case parse contents of
+    Right ps -> return ps
+    Left err -> Left [toText $ errorBundlePretty err]
+  valids <- gather $ map isValid passwords
+  return $ sum $ map fromEnum valids
 
-part1 :: Password -> Bool
-part1 Password {..} = count >= a && count <= b
+part1 :: Password -> Either Text Bool
+part1 Password {..} = Right $ count >= a && count <= b
   where
     countLetter :: Char -> String -> Int
     countLetter l s = foldr (\c n -> if c == l then n + 1 else n) 0 s
 
-    count = countLetter letter $ toString password
+    count = countLetter letter password
 
-part2 :: Password -> Bool
-part2 Password {..} = letterAt a `xor` letterAt b
+part2 :: Password -> Either Text Bool
+part2 Password {..} = do
+  a' <- letterAt a
+  b' <- letterAt b
+  return $ a' `xor` b'
   where
-    letterAt i = password !! (i - 1) == letter
+    letterAt i = maybeToRight "index out of password bounds" $ do
+      l <- password !!? (i - 1)
+      return $ l == letter

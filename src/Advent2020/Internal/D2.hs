@@ -1,7 +1,6 @@
 module Advent2020.Internal.D2 (parse, Password (..), errorBundlePretty) where
 
 import Relude hiding (max, min, some)
-import Relude.Unsafe (read)
 import Text.Megaparsec (ParseErrorBundle, Parsec, chunk, errorBundlePretty, manyTill, runParser, some, (<?>))
 import Text.Megaparsec.Char (char, letterChar, newline, numberChar, spaceChar)
 
@@ -21,9 +20,13 @@ type Parser = Parsec Void Text
 parser :: Parser Password
 parser = do
   a' <- numberChar `manyTill` char '-' <?> "a"
-  let a :: Int = read a'
+  a <- case readEither a' of
+    Right num -> return num
+    Left e -> fail $ toString e
   b' <- numberChar `manyTill` spaceChar <?> "b"
-  let b :: Int = read b'
+  b <- case readEither b' of
+    Right num -> return num
+    Left e -> fail $ toString e
   letter <- letterChar <?> "letter"
   _ <- chunk ": "
   password <- letterChar `manyTill` newline <?> "password"

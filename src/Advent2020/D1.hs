@@ -1,19 +1,23 @@
 module Advent2020.D1 (run, part1, part2) where
 
 import Relude
-import Relude.Unsafe (fromJust, read)
+import Advent2020.Internal (gather)
 
-run :: Text -> ([Int] -> Int) -> Int
-run contents runner = runner xs
+run :: Text -> ([Int] -> Maybe Int) -> Either [Text] Int
+run contents runner = xs >>= maybeToRight ["no solution found"] . runner
   where
     ls = lines contents
-    xs = map ((\x -> read x :: Int) . toString) ls
+    xs = gather $ map ((\x -> readEither x :: Either Text Int) . toString) ls
 
-part1 :: [Int] -> Int
-part1 entries = let (x, y) = fromJust $ find (\(a, b) -> a + b == 2020) (pairs entries) in x * y
+part1 :: [Int] -> Maybe Int
+part1 entries = do
+  (x, y) <- find (\(a, b) -> a + b == 2020) $ pairs entries
+  return $ x * y
 
-part2 :: [Int] -> Int
-part2 entries = let (x, y, z) = fromJust $ find (\(a, b, c) -> a + b + c == 2020) (triples entries) in x * y * z
+part2 :: [Int] -> Maybe Int
+part2 entries = do
+  (x, y, z) <- find (\(a, b, c) -> a + b + c == 2020) $ triples entries
+  return $ x * y * z
 
 pairs :: [a] -> [(a, a)]
 pairs (x : xs) = map (x,) xs ++ pairs xs
