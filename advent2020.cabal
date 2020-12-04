@@ -26,6 +26,7 @@ common lang
     TemplateHaskell
     TupleSections
     TypeOperators
+    LambdaCase
 
   ghc-options:
     -Wall -Wincomplete-uni-patterns -Wcompat
@@ -42,10 +43,13 @@ library
   exposed-modules:
     Advent2020.D1
     Advent2020.D2
+    Advent2020.D3
     Advent2020.Internal
     Advent2020.Internal.D2
 
-  build-depends:   megaparsec ==9.0.1
+  build-depends:
+    , either      ==5.0.1.1
+    , megaparsec  ==9.0.1
 
 test-suite tests
   import:         lang
@@ -57,6 +61,7 @@ test-suite tests
   other-modules:
     D1Spec
     D2Spec
+    D3Spec
 
   build-depends:
     , advent2020

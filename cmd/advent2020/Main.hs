@@ -1,7 +1,8 @@
 module Main (main) where
 
-import qualified Advent2020.D1 as D1 (run, part1, part2)
-import qualified Advent2020.D2 as D2 (run, part1, part2)
+import qualified Advent2020.D1 as D1 (part1, part2, run)
+import qualified Advent2020.D2 as D2 (part1, part2, run)
+import qualified Advent2020.D3 as D3 (part1, run)
 import Options.Applicative (ParserInfo, auto, briefDesc, execParser, helper, info, long, option, progDesc, strOption)
 import Relude
 
@@ -37,5 +38,8 @@ main = do
     2 -> case part of
       1 -> print $ D2.run contents D2.part1
       2 -> print $ D2.run contents D2.part2
+      _ -> putTextLn "No such part"
+    3 -> case part of
+      1 -> print $ D3.run contents D3.part1
       _ -> putTextLn "No such part"
     _ -> putTextLn "No such puzzle"
