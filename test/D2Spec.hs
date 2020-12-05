@@ -21,8 +21,8 @@ spec = do
         Right passwords -> passwords `shouldBe` exampleParse
         Left errors -> expectationFailure $ errorBundlePretty errors
     it "determines valid passwords" $ do
-      fmap part1 exampleParse `shouldBe` Right <$> [True, False, True]
+      part1 <$> exampleParse `shouldBe` Right <$> [True, False, True]
 
   describe "part 2" $ do
     it "determines Toboggan-valid passwords" $ do
-      fmap part2 exampleParse `shouldBe` Right <$> [True, False, False]
+      part2 <$> exampleParse `shouldBe` Right <$> [True, False, False]
