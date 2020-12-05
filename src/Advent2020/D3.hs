@@ -1,10 +1,10 @@
-module Advent2020.D3 (parse, SledMap (..), MapSquare (..), slopePath, run, part1) where
+module Advent2020.D3 (parse, SledMap (..), MapSquare (..), slopePath, run, part1, treesPerSlope, Slope (..)) where
 
-import Relude hiding (some)
-import Text.Megaparsec (runParser, errorBundlePretty, some, manyTill, Parsec)
-import Text.Megaparsec.Char (spaceChar, char)
 import Advent2020.Internal (gather)
 import Data.Either.Combinators (mapLeft)
+import Relude hiding (some)
+import Text.Megaparsec (Parsec, errorBundlePretty, manyTill, runParser, some)
+import Text.Megaparsec.Char (char, spaceChar)
 
 data MapSquare = Open | Tree deriving (Show, Eq)
 
@@ -23,7 +23,7 @@ type Parser = Parsec Void Text
 parser :: Parser SledMap
 parser = do
   rows <- some rowParser
-  return SledMap{rows}
+  return SledMap {rows}
   where
     openSquareParser :: Parser MapSquare
     openSquareParser = char '.' >> return Open
@@ -38,7 +38,7 @@ parser = do
     rowParser = squareParser `manyTill` spaceChar
 
 squareAt :: SledMap -> (Int, Int) -> Maybe MapSquare
-squareAt SledMap{..} (x, y) = do
+squareAt SledMap {..} (x, y) = do
   row <- rows !!? y
   let l = length row
   let x' = x `mod` l
@@ -60,8 +60,11 @@ run contents runner = do
   runner smap
 
 part1 :: SledMap -> Either Text Int
-part1 smap@SledMap{..} = do
-  let path = take (length rows) $ slopePath Slope{right=3, down=1}
+part1 = flip treesPerSlope Slope {right = 3, down = 1}
+
+treesPerSlope :: SledMap -> Slope -> Either Text Int
+treesPerSlope smap@SledMap {..} slope = do
+  let path = takeWhile (\(_, y) -> y < length rows) $ slopePath slope
   squares <- mapLeft mconcat $ gather $ maybeToRight "invalid square" . squareAt smap <$> path
   return $ sum $ fmap countSquare squares
   where
