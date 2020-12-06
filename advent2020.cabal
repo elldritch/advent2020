@@ -18,6 +18,7 @@ common lang
     FlexibleContexts
     FlexibleInstances
     GeneralizedNewtypeDeriving
+    LambdaCase
     MultiParamTypeClasses
     NamedFieldPuns
     OverloadedStrings
@@ -26,7 +27,6 @@ common lang
     TemplateHaskell
     TupleSections
     TypeOperators
-    LambdaCase
 
   ghc-options:
     -Wall -Wincomplete-uni-patterns -Wcompat
@@ -44,10 +44,12 @@ library
     Advent2020.D1
     Advent2020.D2
     Advent2020.D3
+    Advent2020.D4
     Advent2020.Internal
     Advent2020.Internal.D2
 
   build-depends:
+    , containers  ==0.6.4.1
     , either      ==5.0.1.1
     , megaparsec  ==9.0.1
 
@@ -62,6 +64,7 @@ test-suite tests
     D1Spec
     D2Spec
     D3Spec
+    D4Spec
 
   build-depends:
     , advent2020
