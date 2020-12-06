@@ -2,7 +2,7 @@ module Advent2020.D3 (run, part1, part2) where
 
 import Advent2020.Internal (gather', label)
 import Advent2020.Internal.D3 (SledMap, Slope (..), parse, treesPerSlope)
-import Relude hiding (some)
+import Relude
 
 run :: Text -> (SledMap -> Either Text Int) -> Either Text Int
 run contents runner = do

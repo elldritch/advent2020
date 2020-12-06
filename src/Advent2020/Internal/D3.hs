@@ -9,7 +9,7 @@ module Advent2020.Internal.D3
 where
 
 import Advent2020.Internal (Parser, gather', parseWithPrettyErrors)
-import Relude hiding (some)
+import Relude
 import Text.Megaparsec (eof, hidden, manyTill, someTill)
 import Text.Megaparsec.Char (char, spaceChar)
 

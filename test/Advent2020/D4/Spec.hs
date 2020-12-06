@@ -19,8 +19,7 @@ exampleInput =
       "hgt:179cm",
       "",
       "hcl:#cfa07d eyr:2025 pid:166559648",
-      "iyr:2011 ecl:brn hgt:59in",
-      ""
+      "iyr:2011 ecl:brn hgt:59in"
     ]
 
 examplePassports :: [Passport]

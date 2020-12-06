@@ -5,7 +5,7 @@ module Advent2020.Internal.D2
 where
 
 import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
-import Relude hiding (some)
+import Relude
 import Text.Megaparsec (chunk, eof, hidden, label, someTill, (<?>))
 import Text.Megaparsec.Char (char, digitChar, letterChar, newline, spaceChar)
 

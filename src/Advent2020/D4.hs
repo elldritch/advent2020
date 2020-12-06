@@ -2,8 +2,8 @@ module Advent2020.D4 (parse, Passport (..), part1) where
 
 import Advent2020.Internal (Parser, parseWithPrettyErrors)
 import Data.Map (lookup)
-import Relude hiding (some)
-import Text.Megaparsec (count, eof, some, someTill)
+import Relude
+import Text.Megaparsec (count, eof, hidden, someTill)
 import Text.Megaparsec.Char (alphaNumChar, char, letterChar, newline, spaceChar)
 
 data Passport = Passport
@@ -22,7 +22,7 @@ parse :: Text -> Either Text [Passport]
 parse = parseWithPrettyErrors parser
 
 parser :: Parser [Passport]
-parser = some passportParser
+parser = passportParser `someTill` hidden eof
   where
     passportParser :: Parser Passport
     passportParser = do
