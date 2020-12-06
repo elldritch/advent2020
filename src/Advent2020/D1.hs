@@ -1,12 +1,19 @@
 module Advent2020.D1 (run, part1, part2) where
 
-import Advent2020.Internal (readInt, gather')
-import Relude
+import Advent2020.Internal (label, parseWith, parseWithPrettyErrors, readInt)
+import Relude hiding (some)
+import Text.Megaparsec (eof, hidden, someTill, (<?>))
+import Text.Megaparsec.Char (digitChar, newline)
 
 run :: Text -> ([Int] -> Maybe Int) -> Either Text Int
-run contents runner = xs >>= maybeToRight "no solution found" . runner
+run contents runner = do
+  xs <- label "parsing input" $ parse contents
+  maybeToRight "no solution found" $ runner xs
   where
-    xs = gather' $ map (readInt . toString) $ lines contents
+    parse :: Text -> Either Text [Int]
+    parse = parseWithPrettyErrors $ parseWith readInt parseNumberLine `someTill` hidden eof
+
+    parseNumberLine = digitChar `someTill` newline <?> "number"
 
 part1 :: [Int] -> Maybe Int
 part1 entries = do

@@ -2,7 +2,7 @@ module Advent2020.D1.Spec (spec) where
 
 import Advent2020.D1 (part1, part2)
 import Relude
-import Test.Hspec (describe, Spec, it, shouldBe)
+import Test.Hspec (Spec, describe, it, shouldBe)
 
 spec :: Spec
 spec = do

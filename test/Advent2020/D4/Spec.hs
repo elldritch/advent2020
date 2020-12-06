@@ -1,8 +1,8 @@
 module Advent2020.D4.Spec (spec) where
 
+import Advent2020.D4 (Passport (..), parse)
 import Relude
-import Test.Hspec (expectationFailure, shouldBe, it, describe, Spec)
-import Advent2020.D4 (parse, Passport(..))
+import Test.Hspec (Spec, describe, expectationFailure, it, shouldBe)
 
 exampleInput :: Text
 exampleInput =

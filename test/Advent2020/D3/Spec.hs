@@ -1,6 +1,6 @@
 module Advent2020.D3.Spec (spec) where
 
-import Advent2020.D3 (part2, MapSquare (..), SledMap (..), Slope (..), parse, treesPerSlope)
+import Advent2020.D3 (MapSquare (..), SledMap (..), Slope (..), parse, part2, treesPerSlope)
 import Relude
 import Test.Hspec (Spec, describe, it, shouldBe)
 
