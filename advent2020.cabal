@@ -47,6 +47,7 @@ library
     Advent2020.D4
     Advent2020.Internal
     Advent2020.Internal.D2
+    Advent2020.Internal.D3
 
   build-depends:
     , containers  ==0.6.4.1

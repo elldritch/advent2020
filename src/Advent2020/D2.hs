@@ -6,7 +6,7 @@ import Relude
 
 run :: Text -> (Password -> Either Text Bool) -> Either Text Int
 run contents isValid = do
-  passwords <- label "parsing input" $ parse contents
+  passwords <- label "parsing passwords" $ parse contents
   valids <- label "computing valid passwords" $ mapE' isValid passwords
   return $ sum $ map fromEnum valids
 
@@ -20,8 +20,8 @@ part1 Password {..} = Right $ count >= a && count <= b
 
 part2 :: Password -> Either Text Bool
 part2 Password {..} = do
-  a' <- letterAt a
-  b' <- letterAt b
+  a' <- label "getting first letter" $ letterAt a
+  b' <- label "getting second letter" $ letterAt b
   return $ a' `xor` b'
   where
     letterAt i = maybeToRight ("index " <> show i <> " out of bounds of text " <> show password) $ do

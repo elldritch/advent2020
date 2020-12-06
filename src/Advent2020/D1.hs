@@ -7,7 +7,7 @@ import Text.Megaparsec.Char (digitChar, newline)
 
 run :: Text -> ([Int] -> Maybe Int) -> Either Text Int
 run contents runner = do
-  xs <- label "parsing input" $ parse contents
+  xs <- label "parsing expenses" $ parse contents
   maybeToRight "no solution found" $ runner xs
   where
     parse :: Text -> Either Text [Int]
