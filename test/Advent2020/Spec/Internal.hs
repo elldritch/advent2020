@@ -1,4 +1,11 @@
-module Advent2020.Spec.Internal () where
+module Advent2020.Spec.Internal (shouldBe') where
 
--- parseShouldBe :: (Text -> Either Text t) -> t -> Expectation
--- parseShouldBe = undefined
+import Relude
+import Test.Hspec (Expectation, expectationFailure, shouldBe)
+
+-- | Like 'Test.Hspec.shouldBe', but with pretty-printing for @'Either' 'Text'@
+-- errors.
+shouldBe' :: (Show t, Eq t) => Either Text t -> t -> Expectation
+shouldBe' actual expected = case actual of
+  Right r -> r `shouldBe` expected
+  Left err -> expectationFailure $ toString err

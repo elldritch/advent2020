@@ -2,8 +2,9 @@ module Advent2020.D2.Spec (spec) where
 
 import Advent2020.D2 (part1, part2)
 import Advent2020.Internal.D2 (Password (..), parse)
+import Advent2020.Spec.Internal (shouldBe')
 import Relude
-import Test.Hspec (Spec, expectationFailure, it, shouldBe)
+import Test.Hspec (Spec, it, shouldBe)
 
 exampleInput :: Text
 exampleInput =
@@ -23,10 +24,7 @@ examplePasswords =
 spec :: Spec
 spec = do
   it "parses password files" $ do
-    let parsed = parse exampleInput
-    case parsed of
-      Right passwords -> passwords `shouldBe` examplePasswords
-      Left errors -> expectationFailure $ toString errors
+    parse exampleInput `shouldBe'` examplePasswords
 
   it "determines valid passwords" $ do
     part1 <$> examplePasswords `shouldBe` Right <$> [True, False, True]

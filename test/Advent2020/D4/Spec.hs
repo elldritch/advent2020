@@ -1,8 +1,9 @@
 module Advent2020.D4.Spec (spec) where
 
 import Advent2020.D4 (Passport (..), parse)
+import Advent2020.Spec.Internal (shouldBe')
 import Relude
-import Test.Hspec (Spec, describe, expectationFailure, it, shouldBe)
+import Test.Hspec (Spec, it)
 
 exampleInput :: Text
 exampleInput =
@@ -68,9 +69,5 @@ examplePassports =
 
 spec :: Spec
 spec = do
-  describe "part 1" $ do
-    it "parses passports" $ do
-      let parsed = parse exampleInput
-      case parsed of
-        Right passports -> passports `shouldBe` examplePassports
-        Left err -> expectationFailure $ toString err
+  it "parses passports" $ do
+    parse exampleInput `shouldBe'` examplePassports

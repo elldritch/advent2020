@@ -1,6 +1,7 @@
 module Advent2020.D3.Spec (spec) where
 
 import Advent2020.Internal.D3 (MapSquare (..), SledMap (..), Slope (..), parse, treesPerSlope)
+import Advent2020.Spec.Internal (shouldBe')
 import Relude
 import Test.Hspec (Spec, it, shouldBe)
 
@@ -41,7 +42,7 @@ exampleSledMap =
 spec :: Spec
 spec = do
   it "parses sled maps" $ do
-    parse exampleInput `shouldBe` Right exampleSledMap
+    parse exampleInput `shouldBe'` exampleSledMap
 
   it "calculates trees in the path" $ do
     treesPerSlope exampleSledMap Slope {right = 1, down = 1} `shouldBe` Right 2
