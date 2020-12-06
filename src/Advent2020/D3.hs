@@ -1,4 +1,4 @@
-module Advent2020.D3 (parse, SledMap (..), MapSquare (..), slopePath, run, part1, treesPerSlope, Slope (..)) where
+module Advent2020.D3 (parse, SledMap (..), MapSquare (..), slopePath, run, part1, part2, treesPerSlope, Slope (..)) where
 
 import Advent2020.Internal (gather)
 import Data.Either.Combinators (mapLeft)
@@ -71,3 +71,16 @@ treesPerSlope smap@SledMap {..} slope = do
     countSquare = \case
       Open -> 0
       Tree -> 1
+
+part2 :: SledMap -> Either Text Int
+part2 smap = do
+  trees <- mapLeft mconcat $ gather $ treesPerSlope smap <$> slopes
+  return $ product trees
+  where
+    slopes =
+      [ Slope {right = 1, down = 1},
+        Slope {right = 3, down = 1},
+        Slope {right = 5, down = 1},
+        Slope {right = 7, down = 1},
+        Slope {right = 1, down = 2}
+      ]
