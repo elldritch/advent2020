@@ -1,4 +1,4 @@
-module D4Spec (spec) where
+module Advent2020.D4.Spec (spec) where
 
 import Relude
 import Test.Hspec (expectationFailure, shouldBe, it, describe, Spec)

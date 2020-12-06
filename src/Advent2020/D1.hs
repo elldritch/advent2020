@@ -1,13 +1,12 @@
 module Advent2020.D1 (run, part1, part2) where
 
+import Advent2020.Internal (readInt, gather')
 import Relude
-import Advent2020.Internal (gather)
 
-run :: Text -> ([Int] -> Maybe Int) -> Either [Text] Int
-run contents runner = xs >>= maybeToRight ["no solution found"] . runner
+run :: Text -> ([Int] -> Maybe Int) -> Either Text Int
+run contents runner = xs >>= maybeToRight "no solution found" . runner
   where
-    ls = lines contents
-    xs = gather $ map ((\x -> readEither x :: Either Text Int) . toString) ls
+    xs = gather' $ map (readInt . toString) $ lines contents
 
 part1 :: [Int] -> Maybe Int
 part1 entries = do

@@ -1,9 +1,9 @@
 module Advent2020.D3 (parse, SledMap (..), MapSquare (..), slopePath, run, part1, part2, treesPerSlope, Slope (..)) where
 
-import Advent2020.Internal (gather)
+import Advent2020.Internal (Parser, gather, parseWithPrettyErrors)
 import Data.Either.Combinators (mapLeft)
 import Relude hiding (some)
-import Text.Megaparsec (Parsec, errorBundlePretty, manyTill, runParser, some)
+import Text.Megaparsec (manyTill, some)
 import Text.Megaparsec.Char (char, spaceChar)
 
 data MapSquare = Open | Tree deriving (Show, Eq)
@@ -14,11 +14,7 @@ newtype SledMap = SledMap
   deriving (Show, Eq)
 
 parse :: Text -> Either Text SledMap
-parse contents = case runParser parser "" contents of
-  Right smap -> Right smap
-  Left errs -> Left $ toText $ errorBundlePretty errs
-
-type Parser = Parsec Void Text
+parse = parseWithPrettyErrors parser
 
 parser :: Parser SledMap
 parser = do

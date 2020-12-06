@@ -61,10 +61,11 @@ test-suite tests
 
   -- cabal-fmt: expand test -Main
   other-modules:
-    D1Spec
-    D2Spec
-    D3Spec
-    D4Spec
+    Advent2020.D1.Spec
+    Advent2020.D2.Spec
+    Advent2020.D3.Spec
+    Advent2020.D4.Spec
+    Advent2020.Spec.Internal
 
   build-depends:
     , advent2020

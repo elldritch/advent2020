@@ -1,9 +1,9 @@
 module Advent2020.D4 (parse, Passport (..), part1) where
 
-import Data.Either.Combinators (mapLeft)
+import Advent2020.Internal (Parser, parseWithPrettyErrors)
 import Data.Map (lookup)
 import Relude hiding (some)
-import Text.Megaparsec (someTill, eof, Parsec, count, errorBundlePretty, runParser, some)
+import Text.Megaparsec (count, eof, some, someTill)
 import Text.Megaparsec.Char (alphaNumChar, char, letterChar, newline, spaceChar)
 
 data Passport = Passport
@@ -19,9 +19,7 @@ data Passport = Passport
   deriving (Show, Eq)
 
 parse :: Text -> Either Text [Passport]
-parse contents = mapLeft (toText . errorBundlePretty) $ runParser parser "" contents
-
-type Parser = Parsec Void Text
+parse = parseWithPrettyErrors parser
 
 parser :: Parser [Passport]
 parser = some passportParser

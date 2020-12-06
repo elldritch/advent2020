@@ -1,7 +1,8 @@
-module Advent2020.Internal.D2 (parse, Password (..), errorBundlePretty) where
+module Advent2020.Internal.D2 (parse, Password (..)) where
 
-import Relude hiding (max, min, some)
-import Text.Megaparsec (ParseErrorBundle, Parsec, chunk, errorBundlePretty, manyTill, runParser, some, (<?>))
+import Advent2020.Internal (Parser, parseWithPrettyErrors)
+import Relude hiding (some)
+import Text.Megaparsec (chunk, some, someTill, (<?>))
 import Text.Megaparsec.Char (char, letterChar, newline, numberChar, spaceChar)
 
 data Password = Password
@@ -12,22 +13,20 @@ data Password = Password
   }
   deriving (Show, Eq)
 
-parse :: Text -> Either (ParseErrorBundle Text Void) [Password]
-parse = runParser (some parser) ""
-
-type Parser = Parsec Void Text
+parse :: Text -> Either Text [Password]
+parse = parseWithPrettyErrors $ some parser
 
 parser :: Parser Password
 parser = do
-  a' <- numberChar `manyTill` char '-' <?> "a"
+  a' <- numberChar `someTill` char '-' <?> "a"
   a <- case readEither a' of
     Right num -> return num
     Left e -> fail $ toString e
-  b' <- numberChar `manyTill` spaceChar <?> "b"
+  b' <- numberChar `someTill` spaceChar <?> "b"
   b <- case readEither b' of
     Right num -> return num
     Left e -> fail $ toString e
   letter <- letterChar <?> "letter"
   _ <- chunk ": "
-  password <- letterChar `manyTill` newline <?> "password"
+  password <- letterChar `someTill` newline <?> "password"
   return Password {..}

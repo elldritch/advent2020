@@ -1,7 +1,7 @@
-module D2Spec (spec) where
+module Advent2020.D2.Spec (spec) where
 
 import Advent2020.D2 (part1, part2)
-import Advent2020.Internal.D2 (Password (..), errorBundlePretty, parse)
+import Advent2020.Internal.D2 (Password (..), parse)
 import Relude
 import Test.Hspec (Spec, describe, expectationFailure, it, shouldBe)
 
@@ -19,7 +19,7 @@ spec = do
       let parsed = parse exampleInput
       case parsed of
         Right passwords -> passwords `shouldBe` exampleParse
-        Left errors -> expectationFailure $ errorBundlePretty errors
+        Left errors -> expectationFailure $ toString errors
     it "determines valid passwords" $ do
       part1 <$> exampleParse `shouldBe` Right <$> [True, False, True]
 

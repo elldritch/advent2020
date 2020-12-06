@@ -1,16 +1,13 @@
 module Advent2020.D2 (run, part1, part2) where
 
+import Advent2020.Internal (gather')
 import Advent2020.Internal.D2 (Password (..), parse)
-import Relude hiding (max, min, some)
-import Text.Megaparsec (errorBundlePretty)
-import Advent2020.Internal (gather)
+import Relude
 
-run :: Text -> (Password -> Either Text Bool) -> Either [Text] Int
+run :: Text -> (Password -> Either Text Bool) -> Either Text Int
 run contents isValid = do
-  passwords <- case parse contents of
-    Right ps -> return ps
-    Left err -> Left [toText $ errorBundlePretty err]
-  valids <- gather $ map isValid passwords
+  passwords <- parse contents
+  valids <- gather' $ map isValid passwords
   return $ sum $ map fromEnum valids
 
 part1 :: Password -> Either Text Bool
