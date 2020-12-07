@@ -2,8 +2,8 @@
 
 module Advent2020.D4 (run, part1, part2) where
 
+import Advent2020.Internal.D4 (Passport (..), parse)
 import Relude
-import Advent2020.Internal.D4 (Passport(..), parse)
 
 run :: Text -> (Passport -> Bool) -> Either Text Int
 run contents runner = do
