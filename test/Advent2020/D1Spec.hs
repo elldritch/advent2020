@@ -1,4 +1,4 @@
-module Advent2020.D1.Spec (spec) where
+module Advent2020.D1Spec (spec) where
 
 import Advent2020.D1 (part1, part2)
 import Relude

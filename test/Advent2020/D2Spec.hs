@@ -1,4 +1,4 @@
-module Advent2020.D2.Spec (spec) where
+module Advent2020.D2Spec (spec) where
 
 import Advent2020.D2 (part1, part2)
 import Advent2020.Internal.D2 (Password (..), parse)

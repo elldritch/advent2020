@@ -9,6 +9,7 @@ module Advent2020.Internal
     Parser,
     parseWithPrettyErrors,
     parseWith,
+    parseWith',
   )
 where
 
@@ -75,8 +76,11 @@ parseWithPrettyErrors parser contents = mapLeft (toText . errorBundlePretty) $ r
 -- | Transform and validate a parsed value. If the validation fails, the parser
 -- fails as well.
 parseWith :: (s -> Either Text t) -> Parser s -> Parser t
-parseWith f p = do
-  x <- p
-  case f x of
-    Right y -> return y
-    Left e -> fail $ toString e
+parseWith f p = p >>= parseWith' f
+
+-- | Transform and validate a parsed value. If the validation fails, the parser
+-- fails as well.
+parseWith' :: (s -> Either Text t) -> s -> Parser t
+parseWith' f v = case f v of
+  Right y -> return y
+  Left e -> fail $ toString e

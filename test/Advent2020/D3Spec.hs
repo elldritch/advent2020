@@ -1,4 +1,4 @@
-module Advent2020.D3.Spec (spec) where
+module Advent2020.D3Spec (spec) where
 
 import Advent2020.Internal.D3 (MapSquare (..), SledMap (..), Slope (..), parse, treesPerSlope)
 import Advent2020.Spec.Internal (shouldBe')
