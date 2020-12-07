@@ -1,6 +1,6 @@
 module Advent2020.D4Spec (spec) where
 
-import Advent2020.D4 (Color (..), Length (..), Passport (..), parse)
+import Advent2020.Internal.D4 (Color (..), Length (..), Passport (..), parse)
 import Advent2020.Spec.Internal (shouldBe')
 import Relude
 import Test.Hspec (Spec, it)
@@ -90,17 +90,17 @@ exampleInvalidPassports =
   [ Passport
       { birthYear = Just (Right 1926),
         issueYear = Just (Right 2018),
-        expirationYear = Just (Left "invalid expiration year: 1972"),
-        height = Just (Left "1:4:\n  |\n1 | 170\n  |    ^\nunexpected end of input\nexpecting digit or letter\n"),
+        expirationYear = Just (Left "invalid expiration year (too low): 1972"),
+        height = Just (Left "could not parse height: unexpected end of input, expecting digit or letter"),
         hairColor = Just (Right "18171d"),
         eyeColor = Just (Right Amber),
-        passportID = Just (Left "1:4:\n  |\n1 | 186cm\n  |    ^\nunexpected 'c'\nexpecting digit\n"),
+        passportID = Just (Left "could not parse passport ID: unexpected 'c', expecting digit"),
         countryID = Just "100"
       },
     Passport
       { birthYear = Just (Right 1946),
         issueYear = Just (Right 2019),
-        expirationYear = Just (Left "invalid expiration year: 1967"),
+        expirationYear = Just (Left "invalid expiration year (too low): 1967"),
         height = Just (Right (Centimeters 170)),
         hairColor = Just (Right "602927"),
         eyeColor = Just (Right Green),
@@ -112,19 +112,19 @@ exampleInvalidPassports =
         issueYear = Just (Right 2012),
         expirationYear = Just (Right 2020),
         height = Just (Right (Centimeters 182)),
-        hairColor = Just (Left "1:1:\n  |\n1 | dab227\n  | ^\nunexpected 'd'\nexpecting '#'\n"),
+        hairColor = Just (Left "could not parse hair color: unexpected 'd', expecting '#'"),
         eyeColor = Just (Right Brown),
         passportID = Just (Right 21572410),
         countryID = Just "277"
       },
     Passport
-      { birthYear = Just (Left "invalid birth year: 2007"),
-        issueYear = Just (Left "invalid issue year: 2023"),
-        expirationYear = Just (Left "invalid expiration year: 2038"),
-        height = Just (Left "1:5:\n  |\n1 | 59cm\n  |     ^\ninvalid cm: 59\n"),
-        hairColor = Just (Left "1:1:\n  |\n1 | 74454a\n  | ^\nunexpected '7'\nexpecting '#'\n"),
+      { birthYear = Just (Left "invalid birth year (too high): 2007"),
+        issueYear = Just (Left "invalid issue year (too high): 2023"),
+        expirationYear = Just (Left "invalid expiration year (too high): 2038"),
+        height = Just (Left "could not parse height: invalid cm (too low): 59"),
+        hairColor = Just (Left "could not parse hair color: unexpected '7', expecting '#'"),
         eyeColor = Just (Left "invalid eye color: \"zzz\""),
-        passportID = Just (Left "1:10:\n  |\n1 | 3556412378\n  |          ^\nunexpected '8'\nexpecting end of input\n"),
+        passportID = Just (Left "could not parse passport ID: unexpected '8', expecting end of input"),
         countryID = Nothing
       }
   ]

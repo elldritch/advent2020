@@ -48,10 +48,11 @@ library
     Advent2020.Internal
     Advent2020.Internal.D2
     Advent2020.Internal.D3
+    Advent2020.Internal.D4
 
   build-depends:
     , containers  ==0.6.4.1
-    , either      ==5.0.1.1
+    , extra       ==1.7.8
     , megaparsec  ==9.0.1
 
 test-suite tests

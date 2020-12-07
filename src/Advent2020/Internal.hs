@@ -13,7 +13,7 @@ module Advent2020.Internal
   )
 where
 
-import Data.Either.Combinators (mapLeft)
+import Data.Either.Extra (mapLeft)
 import Relude
 import Text.Megaparsec (Parsec, errorBundlePretty, runParser)
 
