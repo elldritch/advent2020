@@ -2,12 +2,13 @@
 
 module Advent2020.D4 (run, part1, part2) where
 
+import Advent2020.Internal (label)
 import Advent2020.Internal.D4 (Passport (..), parse)
 import Relude
 
 run :: Text -> (Passport -> Bool) -> Either Text Int
 run contents runner = do
-  ps <- parse contents
+  ps <- label "parsing passports" $ parse contents
   return $ length $ filter runner ps
 
 checkPassport :: (forall a. Maybe (Either Text a) -> Bool) -> Passport -> Bool

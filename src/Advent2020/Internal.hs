@@ -41,7 +41,7 @@ mapE' f xs = gather' $ mapE f xs
 -- | Like Megaparsec's 'Text.Megaparsec.label', but for nice error messages with
 -- @'Either' 'Text'@.
 label :: Text -> Either Text t -> Either Text t
-label l = mapLeft (\err -> "error while " <> l <> ": " <> err)
+label name = mapLeft (\err -> "error while " <> name <> ": " <> err)
 
 -- | Takes a list of successes or failures. On any failure, produces a list of
 -- failures. Otherwise, produces a list of successes.
