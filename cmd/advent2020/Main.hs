@@ -4,9 +4,9 @@ import qualified Advent2020.D1 as D1 (part1, part2, run)
 import qualified Advent2020.D2 as D2 (part1, part2, run)
 import qualified Advent2020.D3 as D3 (part1, part2, run)
 import qualified Advent2020.D4 as D4 (part1, part2, run)
+import qualified Advent2020.D5 as D5 (part1, run)
 import Options.Applicative (ParserInfo, auto, briefDesc, execParser, helper, info, long, option, progDesc, strOption)
 import Relude
-import qualified Advent2020.D5 as D5 (part1)
 
 data Options = Options
   { day :: Int,
@@ -50,7 +50,7 @@ main = do
       2 -> runEitherPretty $ D4.run contents D4.part2
       _ -> catchAll
     5 -> case part of
-      1 -> runEitherPretty $ D5.part1 contents
+      1 -> runEitherPretty $ D5.run contents D5.part1
       _ -> catchAll
     _ -> do
       putTextLn "ERROR: no such puzzle"

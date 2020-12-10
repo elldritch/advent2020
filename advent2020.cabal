@@ -50,6 +50,7 @@ library
     Advent2020.Internal.D2
     Advent2020.Internal.D3
     Advent2020.Internal.D4
+    Advent2020.Internal.D5
 
   build-depends:
     , containers  ==0.6.4.1
