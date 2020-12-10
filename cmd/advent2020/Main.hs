@@ -1,12 +1,13 @@
 module Main (main) where
 
-import qualified Advent2020.D1 as D1 (part1, part2, run)
-import qualified Advent2020.D2 as D2 (part1, part2, run)
-import qualified Advent2020.D3 as D3 (part1, part2, run)
-import qualified Advent2020.D4 as D4 (part1, part2, run)
-import qualified Advent2020.D5 as D5 (part1, part2, run)
-import qualified Advent2020.D6 as D6 (part1, part2, run)
-import qualified Advent2020.D7 as D7 (part1, part2, run)
+import qualified Advent2020.D1 as D1
+import qualified Advent2020.D2 as D2
+import qualified Advent2020.D3 as D3
+import qualified Advent2020.D4 as D4
+import qualified Advent2020.D5 as D5
+import qualified Advent2020.D6 as D6
+import qualified Advent2020.D7 as D7
+import qualified Advent2020.D8 as D8
 import Options.Applicative (ParserInfo, auto, briefDesc, execParser, helper, info, long, option, progDesc, strOption)
 import Relude
 
@@ -62,6 +63,9 @@ main = do
     7 -> case part of
       1 -> runEitherPretty $ D7.run contents D7.part1
       2 -> runEitherPretty $ D7.run contents D7.part2
+      _ -> catchAll
+    8 -> case part of
+      1 -> runEitherPretty $ D8.part1 contents
       _ -> catchAll
     _ -> do
       putTextLn "ERROR: no such puzzle"
