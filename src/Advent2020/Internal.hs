@@ -1,5 +1,6 @@
 module Advent2020.Internal
-  ( readInt,
+  ( traceShowWith,
+    readInt,
     map',
     mapE,
     mapE',
@@ -16,6 +17,10 @@ where
 import Data.Either.Extra (mapLeft)
 import Relude
 import Text.Megaparsec (Parsec, errorBundlePretty, runParser)
+
+-- | 'traceShow' a message derived from the traced value.
+traceShowWith :: (Show b) => (a -> b) -> a -> a
+traceShowWith f x = traceShow (f x) x
 
 -- | 'readEither' specialized to integers, with clearer error message.
 readInt :: (ToString s) => s -> Either Text Int
