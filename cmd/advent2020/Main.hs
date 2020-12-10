@@ -6,6 +6,7 @@ import qualified Advent2020.D3 as D3 (part1, part2, run)
 import qualified Advent2020.D4 as D4 (part1, part2, run)
 import qualified Advent2020.D5 as D5 (part1, part2, run)
 import qualified Advent2020.D6 as D6 (part1, part2, run)
+import qualified Advent2020.D7 as D7 (part1, run)
 import Options.Applicative (ParserInfo, auto, briefDesc, execParser, helper, info, long, option, progDesc, strOption)
 import Relude
 
@@ -57,6 +58,9 @@ main = do
     6 -> case part of
       1 -> runEitherPretty $ D6.run contents D6.part1
       2 -> runEitherPretty $ D6.run contents D6.part2
+      _ -> catchAll
+    7 -> case part of
+      1 -> runEitherPretty $ D7.run contents D7.part1
       _ -> catchAll
     _ -> do
       putTextLn "ERROR: no such puzzle"

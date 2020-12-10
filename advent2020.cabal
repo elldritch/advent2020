@@ -47,12 +47,14 @@ library
     Advent2020.D4
     Advent2020.D5
     Advent2020.D6
+    Advent2020.D7
     Advent2020.Internal
     Advent2020.Internal.D2
     Advent2020.Internal.D3
     Advent2020.Internal.D4
     Advent2020.Internal.D5
     Advent2020.Internal.D6
+    Advent2020.Internal.D7
 
   build-depends:
     , containers  ==0.6.4.1
@@ -73,6 +75,7 @@ test-suite tests
     Advent2020.D4Spec
     Advent2020.D5Spec
     Advent2020.D6Spec
+    Advent2020.D7Spec
     Advent2020.Spec.Internal
 
   build-depends:
