@@ -37,7 +37,7 @@ data Position t = Position
   { row :: t,
     column :: t
   }
-  deriving (Show, Eq)
+  deriving (Show, Eq, Ord)
 
 type Range = (Int, Int) -- Inclusive on lower bound, exclusive on higher bound.
 
