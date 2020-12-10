@@ -1,19 +1,42 @@
-module Advent2020.D8 (part1) where
+module Advent2020.D8 (run, part1, part2) where
 
-import Advent2020.Internal.D8 (Machine (..), parse, step)
-import Data.Set (insert, member)
+import Advent2020.Internal (gather', setAt)
+import Advent2020.Internal.D8 (Instruction (..), Machine (..), Operation (..), Program, Status (..), parse, runUntilFixed)
+import Control.Monad.Extra (findM)
 import Relude
 
-part1 :: Text -> Either Text Int
-part1 contents = do
+run :: Text -> (Program -> Either Text Int) -> Either Text Int
+run contents runner = do
   program <- parse contents
-  let machines = iterate (>>= step program) $ Right $ Machine {accumulator = 0, programCounter = 0}
-  takeUntilLoop mempty machines
+  runner program
+
+part1 :: Program -> Either Text Int
+part1 program = do
+  (_, Machine {..}) <- runUntilFixed program
+  return accumulator
+
+part2 :: Program -> Either Text Int
+part2 program = do
+  programs <- mconcat <$> gather' (changeProgram' program <$> [1 .. (length program - 1)])
+  terminates <- maybeToRight "could not find terminating program" =<< findM programTerminates programs
+  (_, Machine {..}) <- runUntilFixed terminates
+  return accumulator
   where
-    takeUntilLoop :: Set Int -> [Either Text Machine] -> Either Text Int
-    takeUntilLoop seen (m : ms) = do
-      Machine {..} <- m
-      if member programCounter seen
-        then return accumulator
-        else takeUntilLoop (insert programCounter seen) ms
-    takeUntilLoop _ [] = Left "program never loops"
+    changeProgram' :: Program -> Int -> Either Text [Program]
+    changeProgram' p n = do
+      i@Instruction {..} <- maybeToRight "instruction index out-of-bounds" $ p !!? n
+      let i' = changeInstruction i
+      return $ (\v -> setAt n v p) <$> i'
+
+    changeInstruction :: Instruction -> [Instruction]
+    changeInstruction i@Instruction {..} = case operation of
+      NoOp -> [i, i {operation = Jump}]
+      Jump -> [i, i {operation = NoOp}]
+      Accumulate -> [i]
+
+    programTerminates :: Program -> Either Text Bool
+    programTerminates p = do
+      (_, Machine {..}) <- runUntilFixed p
+      case status of
+        Terminated -> return True
+        Running -> return False

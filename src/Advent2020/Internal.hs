@@ -11,6 +11,7 @@ module Advent2020.Internal
     parseWithPrettyErrors,
     parseWith,
     parseWith',
+    setAt,
   )
 where
 
@@ -89,3 +90,13 @@ parseWith' :: (s -> Either Text t) -> s -> Parser t
 parseWith' f v = case f v of
   Right y -> return y
   Left e -> fail $ toString e
+
+-- | Set a value at an index in a list.
+setAt :: Int -> a -> [a] -> [a]
+setAt i a ls
+  | i < 0 = ls
+  | otherwise = go i ls
+  where
+    go 0 (_ : xs) = a : xs
+    go n (x : xs) = x : go (n -1) xs
+    go _ [] = []

@@ -65,7 +65,8 @@ main = do
       2 -> runEitherPretty $ D7.run contents D7.part2
       _ -> catchAll
     8 -> case part of
-      1 -> runEitherPretty $ D8.part1 contents
+      1 -> runEitherPretty $ D8.run contents D8.part1
+      2 -> runEitherPretty $ D8.run contents D8.part2
       _ -> catchAll
     _ -> do
       putTextLn "ERROR: no such puzzle"

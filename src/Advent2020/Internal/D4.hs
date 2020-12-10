@@ -77,10 +77,10 @@ makePassport m =
     }
 
 validateNumber :: (MonadFail m) => (Int, Int) -> String -> Int -> m Int
-validateNumber (low, high) name n = case n of
-  _ | n < low -> fail $ "invalid " <> name <> " (too low): " <> show n
-  _ | n > high -> fail $ "invalid " <> name <> " (too high): " <> show n
-  _ -> return n
+validateNumber (low, high) name n
+  | n < low = fail $ "invalid " <> name <> " (too low): " <> show n
+  | n > high = fail $ "invalid " <> name <> " (too high): " <> show n
+  | otherwise = return n
 
 validateBirthYear :: Text -> Either Text Int
 validateBirthYear birthYear = do
