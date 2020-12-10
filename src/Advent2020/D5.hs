@@ -15,15 +15,25 @@ part1 :: [Position Int] -> Either Text Int
 part1 ps = return $ foldr max 0 $ seatID <$> ps
 
 part2 :: [Position Int] -> Either Text Int
-part2 ps = do
-  let x = viaNonEmpty head $ filter (\Position{..} -> row > 10 && row < 100) missing
-  seatID <$> maybeToRight "could not find open seat" x
+part2 ps = seatID <$> maybeToRight "could not find open seat" openSeat
   where
     occupied :: Set (Position Int)
     occupied = fromList ps
 
+    isOccupied :: Position Int -> Bool
+    isOccupied p = member p occupied
+
     seats :: [Position Int]
     seats = sortWith row $ sortWith column $ [Position {..} | column <- [0 .. 7], row <- [0 .. 127]]
 
-    missing :: [Position Int]
-    missing = filter (\p -> not $ member p occupied) seats
+    windows :: Int -> [a] -> [[a]]
+    windows n xs = filter (\l -> length l == n) $ map (take n) $ tails xs
+
+    isOpen :: [Position Int] -> Bool
+    isOpen [a, b, c] = isOccupied a && not (isOccupied b) && isOccupied c
+    isOpen xs = error $ "impossible: window of length " <> show (length xs)
+
+    openSeat :: Maybe (Position Int)
+    openSeat = do
+      [_, b, _] <- find isOpen $ windows 3 seats
+      return b
