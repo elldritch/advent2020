@@ -1,6 +1,6 @@
 module Advent2020.D6Spec (spec) where
 
-import Advent2020.D6 (part1)
+import Advent2020.D6 (part1, run)
 import Advent2020.Internal.D6 (Group, parse)
 import Advent2020.Spec.Internal (shouldBe')
 import Relude
@@ -41,4 +41,4 @@ spec = do
     parse exampleInput `shouldBe'` exampleGroups
 
   it "sums questions answered per group" $ do
-    part1 exampleInput `shouldBe'` 11
+    run exampleInput part1 `shouldBe'` 11
