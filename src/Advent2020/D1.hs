@@ -1,20 +1,18 @@
 module Advent2020.D1 (run, part1, part2) where
 
-import Advent2020.Internal (label, pairs, parseNumbers)
+import Advent2020.Internal (pairs, runNumbers)
 import Relude
 
-run :: ([Int] -> Maybe Int) -> Text -> Either Text Int
-run runner contents = do
-  xs <- label "parsing expenses" $ parseNumbers contents
-  maybeToRight "no solution found" $ runner xs
+run :: ([Int] -> Either Text Int) -> Text -> Either Text Int
+run = runNumbers
 
-part1 :: [Int] -> Maybe Int
-part1 entries = do
+part1 :: [Int] -> Either Text Int
+part1 entries = maybeToRight "no solution found" $ do
   (x, y) <- find (\(a, b) -> a + b == 2020) $ pairs entries
   return $ x * y
 
-part2 :: [Int] -> Maybe Int
-part2 entries = do
+part2 :: [Int] -> Either Text Int
+part2 entries = maybeToRight "no solution found" $ do
   (x, y, z) <- find (\(a, b, c) -> a + b + c == 2020) $ triples entries
   return $ x * y * z
 

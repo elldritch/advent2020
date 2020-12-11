@@ -12,6 +12,7 @@ module Advent2020.Internal
     parseWith,
     parseWith',
     parseNumbers,
+    runNumbers,
     setAt,
     pairs,
     windows,
@@ -102,6 +103,12 @@ parseNumbers :: Text -> Either Text [Int]
 parseNumbers = parseWithPrettyErrors $ parseWith readInt numberLineParser `someTill` hidden eof
   where
     numberLineParser = digitChar `someTill` newline <?> "number"
+
+-- | Runner for questions that take number list inputs.
+runNumbers :: ([Int] -> Either Text Int) -> Text -> Either Text Int
+runNumbers runner contents = do
+  xs <- parseNumbers contents
+  runner xs
 
 -- | Set a value at an index in a list.
 setAt :: Int -> a -> [a] -> [a]
