@@ -15,6 +15,8 @@ module Advent2020.Internal
     setAt,
     pairs,
     windows,
+    smallest,
+    largest,
   )
 where
 
@@ -119,3 +121,11 @@ pairs [] = []
 -- | Fixed-size sliding windows of a list.
 windows :: Int -> [a] -> [[a]]
 windows n xs = filter (\l -> length l == n) $ map (take n) $ tails xs
+
+-- | Returns the smallest element of the list.
+smallest :: Ord a => NonEmpty a -> a
+smallest xs = foldr min (head xs) xs
+
+-- | Returns the largest element of the list.
+largest :: Ord a => NonEmpty a -> a
+largest xs = foldr max (head xs) xs

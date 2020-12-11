@@ -70,7 +70,8 @@ main = do
       2 -> runEitherPretty $ D8.run contents D8.part2
       _ -> catchAll
     9 -> case part of
-      1 -> runEitherPretty $ D9.part1 contents
+      1 -> runEitherPretty $ D9.run contents D9.part1
+      2 -> runEitherPretty $ D9.run contents D9.part2
       _ -> catchAll
     _ -> do
       putTextLn "ERROR: no such puzzle"

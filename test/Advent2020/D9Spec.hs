@@ -1,6 +1,6 @@
 module Advent2020.D9Spec (spec) where
 
-import Advent2020.Internal.D9 (findWeakNumber)
+import Advent2020.Internal.D9 (findWeakNumber, findWeakSet)
 import Advent2020.Spec.Internal (shouldBe')
 import Relude
 import Test.Hspec (Spec, it)
@@ -35,3 +35,5 @@ spec = do
     findWeakNumber 5 exampleInput `shouldBe'` 127
     findWeakNumber 25 ([1 .. 25] ++ [100]) `shouldBe'` 100
     findWeakNumber 25 ([1 .. 25] ++ [50]) `shouldBe'` 50
+  it "finds contiguous sets that sum to weak XMAS numbers" $ do
+    findWeakSet 5 exampleInput `shouldBe'` 62

@@ -1,6 +1,6 @@
-module Advent2020.Internal.D9 (findWeakNumber) where
+module Advent2020.Internal.D9 (findWeakNumber, findWeakSet) where
 
-import Advent2020.Internal (pairs, windows)
+import Advent2020.Internal (largest, pairs, smallest, windows)
 import Relude
 
 findWeakNumber :: Int -> [Int] -> Either Text Int
@@ -10,3 +10,12 @@ findWeakNumber preambleSize ns = do
   where
     isSumOfPairs :: Int -> [Int] -> Bool
     isSumOfPairs n xs = isJust $ find (\(a, b) -> a + b == n) $ pairs xs
+
+findWeakSet :: Int -> [Int] -> Either Text Int
+findWeakSet preambleSize ns = do
+  weakNumber <- findWeakNumber preambleSize ns
+  let ws = (`windows` ns) `concatMap` [2 ..]
+  weakSet <- maybeToRight "could not find weak set" $ find (\w -> sum w == weakNumber) ws
+  s <- maybeToRight "weak set is empty" $ viaNonEmpty smallest weakSet
+  l <- maybeToRight "weak set is empty" $ viaNonEmpty largest weakSet
+  return $ s + l
