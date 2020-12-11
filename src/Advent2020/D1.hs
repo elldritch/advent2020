@@ -4,7 +4,7 @@ import Advent2020.Internal (pairs, runNumbers)
 import Relude
 
 run :: ([Int] -> Either Text Int) -> Text -> Either Text Int
-run = runNumbers
+run r = runNumbers (r . toList)
 
 part1 :: [Int] -> Either Text Int
 part1 entries = maybeToRight "no solution found" $ do
@@ -17,5 +17,5 @@ part2 entries = maybeToRight "no solution found" $ do
   return $ x * y * z
 
 triples :: [a] -> [(a, a, a)]
-triples (x : xs) = map (\(y, z) -> (x, y, z)) (pairs xs) ++ triples xs
+triples (x : xs) = ((\(y, z) -> (x, y, z)) <$> pairs xs) ++ triples xs
 triples [] = []

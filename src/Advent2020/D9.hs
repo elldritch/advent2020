@@ -5,7 +5,7 @@ import Advent2020.Internal.D9 (findWeakNumber, findWeakSet)
 import Relude
 
 run :: ([Int] -> Either Text Int) -> Text -> Either Text Int
-run = runNumbers
+run r = runNumbers (r . toList)
 
 part1 :: [Int] -> Either Text Int
 part1 = findWeakNumber 25

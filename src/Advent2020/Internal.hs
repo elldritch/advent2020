@@ -1,5 +1,5 @@
 module Advent2020.Internal
-  ( traceShowWith,
+  ( traceWith,
     readInt,
     map',
     mapE,
@@ -21,14 +21,16 @@ module Advent2020.Internal
   )
 where
 
+import qualified Control.Applicative.Combinators.NonEmpty as NE (someTill)
 import Data.Either.Extra (mapLeft)
 import Relude
 import Text.Megaparsec (Parsec, eof, errorBundlePretty, hidden, runParser, someTill, (<?>))
 import Text.Megaparsec.Char (digitChar, newline)
 
--- | 'traceShow' a message derived from the traced value.
-traceShowWith :: (Show b) => (a -> b) -> a -> a
-traceShowWith f x = traceShow (f x) x
+-- | 'trace' a message derived from the traced value.
+{-# WARNING traceWith "'traceWith' remains in code" #-}
+traceWith :: (a -> Text) -> a -> a
+traceWith f x = trace (toString $ f x) x
 
 -- | 'readEither' specialized to integers, with clearer error message.
 readInt :: (ToString s) => s -> Either Text Int
@@ -99,13 +101,13 @@ parseWith' f v = case f v of
   Left e -> fail $ toString e
 
 -- | Parse newline-delimited numbers.
-parseNumbers :: Text -> Either Text [Int]
-parseNumbers = parseWithPrettyErrors $ parseWith readInt numberLineParser `someTill` hidden eof
+parseNumbers :: Text -> Either Text (NonEmpty Int)
+parseNumbers = parseWithPrettyErrors $ parseWith readInt numberLineParser `NE.someTill` hidden eof
   where
     numberLineParser = digitChar `someTill` newline <?> "number"
 
 -- | Runner for questions that take number list inputs.
-runNumbers :: ([Int] -> Either Text Int) -> Text -> Either Text Int
+runNumbers :: (NonEmpty Int -> Either Text Int) -> Text -> Either Text Int
 runNumbers runner contents = do
   xs <- parseNumbers contents
   runner xs
@@ -122,17 +124,17 @@ setAt i a ls
 
 -- | Pairs of a list.
 pairs :: [a] -> [(a, a)]
-pairs (x : xs) = map (x,) xs ++ pairs xs
+pairs (x : xs) = ((x,) <$> xs) ++ pairs xs
 pairs [] = []
 
 -- | Fixed-size sliding windows of a list.
 windows :: Int -> [a] -> [[a]]
-windows n xs = filter (\l -> length l == n) $ map (take n) $ tails xs
+windows n xs = filter (\l -> length l == n) $ take n <$> tails xs
 
 -- | Returns the smallest element of the list.
-smallest :: Ord a => NonEmpty a -> a
+smallest :: (Ord a) => NonEmpty a -> a
 smallest xs = foldr min (head xs) xs
 
 -- | Returns the largest element of the list.
-largest :: Ord a => NonEmpty a -> a
+largest :: (Ord a) => NonEmpty a -> a
 largest xs = foldr max (head xs) xs

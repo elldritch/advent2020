@@ -8,7 +8,7 @@ run :: (Password -> Either Text Bool) -> Text -> Either Text Int
 run isValid contents = do
   passwords <- label "parsing passwords" $ parse contents
   valids <- label "computing valid passwords" $ mapE' isValid passwords
-  return $ sum $ map fromEnum valids
+  return $ sum $ fromEnum <$> valids
 
 part1 :: Password -> Either Text Bool
 part1 Password {..} = Right $ count >= a && count <= b
