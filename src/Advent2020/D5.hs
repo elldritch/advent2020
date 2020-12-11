@@ -5,8 +5,8 @@ import Advent2020.Internal.D5 (Position (..), parse, seatID, specToPosition)
 import Data.Set (member)
 import Relude
 
-run :: Text -> ([Position Int] -> Either Text t) -> Either Text t
-run contents runner = do
+run :: ([Position Int] -> Either Text t) -> Text -> Either Text t
+run runner contents = do
   specs <- parse contents
   ps <- gather' $ specToPosition <$> specs
   runner ps

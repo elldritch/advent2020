@@ -4,8 +4,8 @@ import Advent2020.Internal (label, mapE')
 import Advent2020.Internal.D2 (Password (..), parse)
 import Relude
 
-run :: Text -> (Password -> Either Text Bool) -> Either Text Int
-run contents isValid = do
+run :: (Password -> Either Text Bool) -> Text -> Either Text Int
+run isValid contents = do
   passwords <- label "parsing passwords" $ parse contents
   valids <- label "computing valid passwords" $ mapE' isValid passwords
   return $ sum $ map fromEnum valids

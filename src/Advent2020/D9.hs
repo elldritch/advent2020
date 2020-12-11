@@ -4,8 +4,8 @@ import Advent2020.Internal (parseNumbers)
 import Advent2020.Internal.D9 (findWeakNumber, findWeakSet)
 import Relude
 
-run :: Text -> ([Int] -> Either Text Int) -> Either Text Int
-run contents runner = do
+run :: ([Int] -> Either Text Int) -> Text -> Either Text Int
+run runner contents = do
   ns <- parseNumbers contents
   runner ns
 

@@ -4,8 +4,8 @@ import Advent2020.Internal.D6 (Group, parse)
 import Data.Set (intersection, size, union)
 import Relude
 
-run :: Text -> (Group -> Set Char) -> Either Text Int
-run contents runner = do
+run :: (Group -> Set Char) -> Text -> Either Text Int
+run runner contents = do
   groups <- parse contents
   return $ sum $ size <$> fmap runner groups
 

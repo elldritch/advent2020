@@ -4,8 +4,8 @@ import Advent2020.Internal (gather', label)
 import Advent2020.Internal.D3 (SledMap, Slope (..), parse, treesPerSlope)
 import Relude
 
-run :: Text -> (SledMap -> Either Text Int) -> Either Text Int
-run contents runner = do
+run :: (SledMap -> Either Text Int) -> Text -> Either Text Int
+run runner contents = do
   smap <- label "parsing sled map" $ parse contents
   label "computing trees in slopes" $ runner smap
 

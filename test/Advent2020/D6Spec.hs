@@ -41,4 +41,4 @@ spec = do
     parse exampleInput `shouldBe'` exampleGroups
 
   it "sums questions answered per group" $ do
-    run exampleInput part1 `shouldBe'` 11
+    run part1 exampleInput `shouldBe'` 11

@@ -5,8 +5,8 @@ import Advent2020.Internal.D8 (Instruction (..), Machine (..), Operation (..), P
 import Control.Monad.Extra (findM)
 import Relude
 
-run :: Text -> (Program -> Either Text Int) -> Either Text Int
-run contents runner = do
+run :: (Program -> Either Text Int) -> Text -> Either Text Int
+run runner contents = do
   program <- parse contents
   runner program
 

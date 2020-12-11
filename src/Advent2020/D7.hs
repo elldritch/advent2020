@@ -5,8 +5,8 @@ import Data.Graph (graphFromEdges, reachable, transposeG)
 import Data.Map (foldrWithKey, keys, lookup)
 import Relude
 
-run :: Text -> ([Rule] -> Either Text Int) -> Either Text Int
-run contents runner = do
+run :: ([Rule] -> Either Text Int) -> Text -> Either Text Int
+run runner contents = do
   rules <- parse contents
   runner rules
 

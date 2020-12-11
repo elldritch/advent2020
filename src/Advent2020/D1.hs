@@ -3,8 +3,8 @@ module Advent2020.D1 (run, part1, part2) where
 import Advent2020.Internal (label, pairs, parseNumbers)
 import Relude
 
-run :: Text -> ([Int] -> Maybe Int) -> Either Text Int
-run contents runner = do
+run :: ([Int] -> Maybe Int) -> Text -> Either Text Int
+run runner contents = do
   xs <- label "parsing expenses" $ parseNumbers contents
   maybeToRight "no solution found" $ runner xs
 
