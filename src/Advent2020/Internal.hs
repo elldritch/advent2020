@@ -11,13 +11,17 @@ module Advent2020.Internal
     parseWithPrettyErrors,
     parseWith,
     parseWith',
+    parseNumbers,
     setAt,
+    pairs,
+    windows,
   )
 where
 
 import Data.Either.Extra (mapLeft)
 import Relude
-import Text.Megaparsec (Parsec, errorBundlePretty, runParser)
+import Text.Megaparsec (Parsec, eof, errorBundlePretty, hidden, runParser, someTill, (<?>))
+import Text.Megaparsec.Char (digitChar, newline)
 
 -- | 'traceShow' a message derived from the traced value.
 traceShowWith :: (Show b) => (a -> b) -> a -> a
@@ -91,6 +95,12 @@ parseWith' f v = case f v of
   Right y -> return y
   Left e -> fail $ toString e
 
+-- | Parse newline-delimited numbers.
+parseNumbers :: Text -> Either Text [Int]
+parseNumbers = parseWithPrettyErrors $ parseWith readInt numberLineParser `someTill` hidden eof
+  where
+    numberLineParser = digitChar `someTill` newline <?> "number"
+
 -- | Set a value at an index in a list.
 setAt :: Int -> a -> [a] -> [a]
 setAt i a ls
@@ -100,3 +110,12 @@ setAt i a ls
     go 0 (_ : xs) = a : xs
     go n (x : xs) = x : go (n -1) xs
     go _ [] = []
+
+-- | Pairs of a list.
+pairs :: [a] -> [(a, a)]
+pairs (x : xs) = map (x,) xs ++ pairs xs
+pairs [] = []
+
+-- | Fixed-size sliding windows of a list.
+windows :: Int -> [a] -> [[a]]
+windows n xs = filter (\l -> length l == n) $ map (take n) $ tails xs

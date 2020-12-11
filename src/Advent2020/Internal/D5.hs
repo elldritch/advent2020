@@ -23,11 +23,10 @@ data Partition
 type SeatSpec = [Partition]
 
 parse :: Text -> Either Text [SeatSpec]
-parse = parseWithPrettyErrors $ do
-  parseSpec `someTill` hidden eof
+parse = parseWithPrettyErrors $ specParser `someTill` hidden eof
   where
-    parseSpec :: Parser SeatSpec
-    parseSpec = do
+    specParser :: Parser SeatSpec
+    specParser = do
       xs <- count 7 ((char 'F' >> return F) <|> (char 'B' >> return B))
       ys <- count 3 ((char 'L' >> return L) <|> (char 'R' >> return R))
       _ <- spaceChar
