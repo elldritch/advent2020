@@ -83,7 +83,7 @@ main = do
         _ -> catchAll
       11 -> case part of
         1 -> runEitherPretty $ D11.run D11.part1
-        -- 2 -> runEitherPretty $ D11.run D11.part2
+        2 -> runEitherPretty $ D11.run D11.part2
         _ -> catchAll
       _ -> catchAll
 
