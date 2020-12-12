@@ -45,9 +45,9 @@ parse = parseWithPrettyErrors $ do
   rows <- row `someTill` eof
   return $ Grid $ fromList $ concatMap (\(y, xs) -> fmap (\(x, p) -> ((x, y), p)) xs) $ zip [0 ..] $ zip [0 ..] <$> rows
   where
-    floorP = void (char '.') >> return Floor
-    emptyP = void (char 'L') >> return Empty
-    occupiedP = void (char '#') >> return Occupied
+    floorP = char '.' >> return Floor
+    emptyP = char 'L' >> return Empty
+    occupiedP = char '#' >> return Occupied
     row = (floorP <|> emptyP <|> occupiedP) `someTill` newline
 
 adjacent :: Grid -> (Int, Int) -> [Position]

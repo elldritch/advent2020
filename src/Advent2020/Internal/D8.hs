@@ -54,9 +54,7 @@ parse = parseWithPrettyErrors $ parseInstruction `someTill` eof
     parseInstruction = do
       operation <- parseOp
       _ <- char ' '
-      sign <-
-        (void (char '+') >> return 1)
-          <|> (void (char '-') >> return (-1))
+      sign <- (char '+' >> return 1) <|> (char '-' >> return (-1))
       value <- parseWith readInt $ digitChar `someTill` newline
       let argument = sign * value
       return Instruction {..}
