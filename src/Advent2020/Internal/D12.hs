@@ -7,6 +7,9 @@ module Advent2020.Internal.D12
     Ship (..),
     initial,
     step,
+    Navigation (..),
+    initial',
+    step',
   )
 where
 
@@ -59,9 +62,11 @@ parse = parseWithPrettyErrors $ (moveP <|> turnP) `someTill` eof
       _ <- newline
       return Instruction {..}
 
+type Position = (Int, Int)
+
 data Ship = Ship
   { orientation :: Orientation,
-    position :: (Int, Int)
+    position :: Position
   }
   deriving (Show, Eq)
 
@@ -74,13 +79,14 @@ step s@Ship {position = (x, y), ..} Instruction {..} = case action of
   Turn dir -> s {orientation = turn dir value orientation}
   Forward -> s {position = move orientation value}
   where
-    move :: Orientation -> Int -> (Int, Int)
+    move :: Orientation -> Int -> Position
     move North v = (x, y + v)
     move South v = (x, y - v)
     move East v = (x + v, y)
     move West v = (x - v, y)
 
     turn :: Direction -> Int -> Orientation -> Orientation
+    turn DRight degrees o = turn DLeft (360 - degrees) o
     turn DLeft degrees o = if degrees == 90 then o' else turn DLeft (degrees - 90) o'
       where
         o' = case o of
@@ -88,10 +94,35 @@ step s@Ship {position = (x, y), ..} Instruction {..} = case action of
           South -> East
           East -> North
           West -> South
-    turn DRight degrees o = if degrees == 90 then o' else turn DRight (degrees - 90) o'
-      where
-        o' = case o of
-          North -> East
-          South -> West
-          East -> South
-          West -> North
+
+data Navigation = Navigation
+  { ship :: Position,
+    waypoint :: Position
+  }
+  deriving (Show, Eq)
+
+initial' :: Navigation
+initial' = Navigation {ship = (0, 0), waypoint = (10, 1)}
+
+step' :: Navigation -> Instruction -> Navigation
+step' n@Navigation {ship = (x, y), waypoint = (wx, wy)} Instruction {..} = case action of
+  Move o -> n {waypoint = moveWaypoint o value}
+  Turn dir -> n {waypoint = rotateWaypoint dir value}
+  Forward -> n {ship = moveShip value}
+  where
+    moveWaypoint :: Orientation -> Int -> Position
+    moveWaypoint North v = (wx, wy + v)
+    moveWaypoint South v = (wx, wy - v)
+    moveWaypoint East v = (wx + v, wy)
+    moveWaypoint West v = (wx - v, wy)
+
+    rotateWaypoint :: Direction -> Int -> Position
+    rotateWaypoint DRight degrees = rotateWaypoint DLeft $ 360 - degrees
+    rotateWaypoint DLeft degrees = case degrees of
+      90 -> (- wy, wx)
+      180 -> (- wx, - wy)
+      270 -> (wy, - wx)
+      _ -> error $ "rotateWaypoint: impossible: invalid degrees" <> show degrees
+
+    moveShip :: Int -> Position
+    moveShip times = (x + times * wx, y + times * wy)

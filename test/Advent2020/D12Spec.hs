@@ -1,6 +1,6 @@
 module Advent2020.D12Spec (spec) where
 
-import Advent2020.Internal.D12 (Action (..), Direction (..), Instruction (..), Orientation (..), Ship (..), initial, parse, step)
+import Advent2020.Internal.D12 (Action (..), Direction (..), Instruction (..), Navigation (..), Orientation (..), Ship (..), initial, initial', parse, step, step')
 import Advent2020.Spec.Internal (shouldBe')
 import Relude
 import Test.Hspec (Spec, it, shouldBe)
@@ -31,3 +31,6 @@ spec = do
 
   it "follows ship instructions" $ do
     foldl' step initial exampleInstructions `shouldBe` Ship {orientation = South, position = (17, -8)}
+
+  it "follows waypoint navigation" $ do
+    foldl' step' initial' exampleInstructions `shouldBe` Navigation {ship = (214, -72), waypoint = (4, -10)}
