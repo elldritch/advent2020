@@ -1,9 +1,9 @@
 module Advent2020.D12Spec (spec) where
 
-import Advent2020.Internal.D12 (Action (..), Instruction (..), parse)
+import Advent2020.Internal.D12 (Action (..), Direction (..), Instruction (..), Orientation (..), Ship (..), initial, parse, step)
 import Advent2020.Spec.Internal (shouldBe')
 import Relude
-import Test.Hspec (Spec, it)
+import Test.Hspec (Spec, it, shouldBe)
 
 exampleInput :: Text
 exampleInput =
@@ -17,14 +17,17 @@ exampleInput =
 
 exampleInstructions :: [Instruction]
 exampleInstructions =
-  [ Instruction {action = MoveForward, value = 10},
-    Instruction {action = MoveNorth, value = 3},
-    Instruction {action = MoveForward, value = 7},
-    Instruction {action = TurnRight, value = 90},
-    Instruction {action = MoveForward, value = 11}
+  [ Instruction {action = Forward, value = 10},
+    Instruction {action = Move North, value = 3},
+    Instruction {action = Forward, value = 7},
+    Instruction {action = Turn DRight, value = 90},
+    Instruction {action = Forward, value = 11}
   ]
 
 spec :: Spec
 spec = do
   it "parses instructions" $ do
     parse exampleInput `shouldBe'` exampleInstructions
+
+  it "follows ship instructions" $ do
+    foldl' step initial exampleInstructions `shouldBe` Ship {orientation = South, position = (17, -8)}

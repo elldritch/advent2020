@@ -3,6 +3,7 @@ module Main (main) where
 import qualified Advent2020.D1 as D1
 import qualified Advent2020.D10 as D10
 import qualified Advent2020.D11 as D11
+import qualified Advent2020.D12 as D12
 import qualified Advent2020.D2 as D2
 import qualified Advent2020.D3 as D3
 import qualified Advent2020.D4 as D4
@@ -84,6 +85,10 @@ main = do
       11 -> case part of
         1 -> runEitherPretty $ D11.run D11.part1
         2 -> runEitherPretty $ D11.run D11.part2
+        _ -> catchAll
+      12 -> case part of
+        1 -> runEitherPretty $ D12.run D12.part1
+        -- 2 -> runEitherPretty $ D12.run D12.part2
         _ -> catchAll
       _ -> catchAll
 

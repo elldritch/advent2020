@@ -1,14 +1,18 @@
 module Advent2020.Internal.D12
   ( Instruction (..),
     Action (..),
+    Orientation (..),
+    Direction (..),
     parse,
+    Ship (..),
+    initial,
+    step,
   )
 where
 
-import Advent2020.Internal (parseWith, parseWithPrettyErrors, readInt)
-import Control.Monad.Combinators (someTill)
+import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
 import Relude
-import Text.Megaparsec (chunk, eof)
+import Text.Megaparsec (chunk, eof, someTill)
 import Text.Megaparsec.Char (char, digitChar, newline)
 
 data Instruction = Instruction
@@ -18,53 +22,57 @@ data Instruction = Instruction
   deriving (Show, Eq)
 
 data Action
-  = MoveNorth
-  | MoveSouth
-  | MoveEast
-  | MoveWest
-  | TurnLeft
-  | TurnRight
-  | MoveForward
+  = Move Orientation
+  | Turn Direction
+  | Forward
   deriving (Show, Eq)
-
-parse :: Text -> Either Text [Instruction]
-parse = parseWithPrettyErrors $ (moveP <|> turnP) `someTill` eof
-  where
-    moveP = do
-      action <-
-        (char 'N' >> return MoveNorth)
-          <|> (char 'S' >> return MoveSouth)
-          <|> (char 'E' >> return MoveEast)
-          <|> (char 'W' >> return MoveWest)
-          <|> (char 'F' >> return MoveForward)
-      value <- parseWith readInt $ digitChar `someTill` newline
-      return Instruction {..}
-    turnP = do
-      action <- (char 'L' >> return TurnLeft) <|> (char 'R' >> return TurnRight)
-      value <- parseWith readInt (chunk "90" <|> chunk "180" <|> chunk "270")
-      _ <- newline
-      return Instruction {..}
 
 data Orientation
   = North
   | South
   | East
   | West
+  deriving (Show, Eq)
+
+data Direction
+  = DLeft
+  | DRight
+  deriving (Show, Eq)
+
+parse :: Text -> Either Text [Instruction]
+parse = parseWithPrettyErrors $ (moveP <|> turnP) `someTill` eof
+  where
+    moveP :: Parser Instruction
+    moveP = do
+      action <-
+        (char 'N' >> return (Move North))
+          <|> (char 'S' >> return (Move South))
+          <|> (char 'E' >> return (Move East))
+          <|> (char 'W' >> return (Move West))
+          <|> (char 'F' >> return Forward)
+      value <- parseWith readInt $ digitChar `someTill` newline
+      return Instruction {..}
+    turnP :: Parser Instruction
+    turnP = do
+      action <- (char 'L' >> return (Turn DLeft)) <|> (char 'R' >> return (Turn DRight))
+      value <- parseWith readInt (chunk "90" <|> chunk "180" <|> chunk "270")
+      _ <- newline
+      return Instruction {..}
 
 data Ship = Ship
   { orientation :: Orientation,
     position :: (Int, Int)
   }
+  deriving (Show, Eq)
+
+initial :: Ship
+initial = Ship {orientation = East, position = (0, 0)}
 
 step :: Ship -> Instruction -> Ship
 step s@Ship {position = (x, y), ..} Instruction {..} = case action of
-  MoveNorth -> s {position = move North value}
-  MoveSouth -> s {position = move South value}
-  MoveEast -> s {position = move East value}
-  MoveWest -> s {position = move West value}
-  TurnLeft -> undefined
-  TurnRight -> undefined
-  MoveForward -> s {position = move orientation value}
+  Move o -> s {position = move o value}
+  Turn dir -> s {orientation = turn dir value orientation}
+  Forward -> s {position = move orientation value}
   where
     move :: Orientation -> Int -> (Int, Int)
     move North v = (x, y + v)
@@ -72,3 +80,18 @@ step s@Ship {position = (x, y), ..} Instruction {..} = case action of
     move East v = (x + v, y)
     move West v = (x - v, y)
 
+    turn :: Direction -> Int -> Orientation -> Orientation
+    turn DLeft degrees o = if degrees == 90 then o' else turn DLeft (degrees - 90) o'
+      where
+        o' = case o of
+          North -> West
+          South -> East
+          East -> North
+          West -> South
+    turn DRight degrees o = if degrees == 90 then o' else turn DRight (degrees - 90) o'
+      where
+        o' = case o of
+          North -> East
+          South -> West
+          East -> South
+          West -> North
