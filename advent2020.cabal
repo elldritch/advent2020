@@ -43,6 +43,7 @@ library
   exposed-modules:
     Advent2020.D1
     Advent2020.D10
+    Advent2020.D11
     Advent2020.D2
     Advent2020.D3
     Advent2020.D4
@@ -53,6 +54,7 @@ library
     Advent2020.D9
     Advent2020.Internal
     Advent2020.Internal.D10
+    Advent2020.Internal.D11
     Advent2020.Internal.D2
     Advent2020.Internal.D3
     Advent2020.Internal.D4
@@ -78,6 +80,7 @@ test-suite tests
   -- cabal-fmt: expand test -Main
   other-modules:
     Advent2020.D10Spec
+    Advent2020.D11Spec
     Advent2020.D1Spec
     Advent2020.D2Spec
     Advent2020.D3Spec
