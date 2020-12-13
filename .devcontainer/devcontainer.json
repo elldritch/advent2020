@@ -1,0 +1,26 @@
+// Based on: https://github.com/microsoft/vscode-dev-containers/blob/master/containers/codespaces-linux/.devcontainer/devcontainer.json
+{
+	"name": "Haskell",
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": { 
+		"terminal.integrated.shell.linux": "/bin/bash"
+	},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"haskell.haskell"
+	],
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "uname -a",
+
+    "remoteUser": "codespace",
+
+    "remoteEnv": {
+        "PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.ghcup/bin"
+    }
+}
