@@ -1,26 +1,22 @@
 // Based on: https://github.com/microsoft/vscode-dev-containers/blob/master/containers/codespaces-linux/.devcontainer/devcontainer.json
 {
-	"name": "Haskell",
+  "name": "Haskell",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "remoteUser": "codespace",
 
-	// Set *default* container specific settings.json values on container create.
-	"settings": { 
-		"terminal.integrated.shell.linux": "/bin/bash"
-	},
+  "extensions": [
+    "haskell.haskell"
+  ],
 
-	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"haskell.haskell"
-	],
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "uname -a",
-
-    "remoteUser": "codespace",
-
-    "remoteEnv": {
-        "PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.ghcup/bin"
-    }
+  // Install ghcup. TODO: actually create a new image that runs this installer.
+  "postCreateCommand": "curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh",
+  // Overrides VS Code's $PATH to include ghcup binaries. TODO: set this in a base image instead.
+  "containerEnv": {
+    "PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.ghcup/bin"
+  },
+  "remoteEnv": {
+    "PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.ghcup/bin"
+  }
 }
