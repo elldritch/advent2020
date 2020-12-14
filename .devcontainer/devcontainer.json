@@ -10,8 +10,6 @@
     "haskell.haskell"
   ],
 
-  // Install ghcup. TODO: actually create a new image that runs this installer.
-  "postCreateCommand": "curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh",
   // Overrides VS Code's $PATH to include ghcup binaries. TODO: set this in a base image instead.
   "containerEnv": {
     "PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.ghcup/bin"
