@@ -1,14 +1,13 @@
 module Advent2020.D7 (run, part1, part2) where
 
+import Advent2020.Internal (simpleRun)
 import Advent2020.Internal.D7 (Rule (..), parse)
 import Data.Graph (graphFromEdges, reachable, transposeG)
 import Data.Map (foldrWithKey, keys, lookup)
 import Relude
 
 run :: ([Rule] -> Either Text Int) -> Text -> Either Text Int
-run runner contents = do
-  rules <- parse contents
-  runner rules
+run = simpleRun parse
 
 part1 :: [Rule] -> Either Text Int
 part1 rules = do

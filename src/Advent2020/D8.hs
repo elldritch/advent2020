@@ -1,14 +1,12 @@
 module Advent2020.D8 (run, part1, part2) where
 
-import Advent2020.Internal (gather', setAt)
+import Advent2020.Internal (gather', setAt, simpleRun)
 import Advent2020.Internal.D8 (Instruction (..), Machine (..), Operation (..), Program, Status (..), parse, runUntilFixed)
 import Control.Monad.Extra (findM)
 import Relude
 
 run :: (Program -> Either Text Int) -> Text -> Either Text Int
-run runner contents = do
-  program <- parse contents
-  runner program
+run = simpleRun parse
 
 part1 :: Program -> Either Text Int
 part1 program = do

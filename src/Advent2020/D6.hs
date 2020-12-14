@@ -7,7 +7,7 @@ import Relude
 run :: (Group -> Set Char) -> Text -> Either Text Int
 run runner contents = do
   groups <- parse contents
-  return $ sum $ size <$> fmap runner groups
+  return $ sum $ size . runner <$> groups
 
 part1 :: Group -> Set Char
 part1 = foldr union mempty

@@ -13,6 +13,9 @@ module Advent2020.Internal
     parseWith',
     parseNumbers,
     runNumbers,
+    runNumbers',
+    simpleRun,
+    simpleRun',
     setAt,
     pairs,
     windows,
@@ -112,6 +115,18 @@ runNumbers :: (NonEmpty Int -> Either Text Int) -> Text -> Either Text Int
 runNumbers runner contents = do
   xs <- parseNumbers contents
   runner xs
+
+-- | Like 'runNumbers', but for '[@Int@]' rather than '@NonEmpty@ @Int@'.
+runNumbers' :: ([Int] -> Either Text Int) -> Text -> Either Text Int
+runNumbers' r = runNumbers (r . toList)
+
+-- | Runner that binds directly to runner.
+simpleRun :: (Text -> Either Text t) -> (t -> Either Text Int) -> Text -> Either Text Int
+simpleRun parser runner contents = parser contents >>= runner
+
+-- | Like 'simpleRun', but specifies a function to transform the output of a runner.
+simpleRun' :: (Text -> Either Text a) -> (b -> Either Text Int) -> (a -> b) -> Text -> Either Text Int
+simpleRun' parser runTo runner contents = parser contents >>= runTo . runner
 
 -- | Set a value at an index in a list.
 setAt :: Int -> a -> [a] -> [a]

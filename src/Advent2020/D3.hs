@@ -1,13 +1,11 @@
 module Advent2020.D3 (run, part1, part2) where
 
-import Advent2020.Internal (gather', label)
+import Advent2020.Internal (gather', simpleRun)
 import Advent2020.Internal.D3 (SledMap, Slope (..), parse, treesPerSlope)
 import Relude
 
 run :: (SledMap -> Either Text Int) -> Text -> Either Text Int
-run runner contents = do
-  smap <- label "parsing sled map" $ parse contents
-  label "computing trees in slopes" $ runner smap
+run = simpleRun parse
 
 part1 :: SledMap -> Either Text Int
 part1 = flip treesPerSlope Slope {right = 3, down = 1}
