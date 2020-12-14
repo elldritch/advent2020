@@ -11,9 +11,6 @@
   ],
 
   // Overrides VS Code's $PATH to include ghcup binaries. TODO: set this in a base image instead.
-  "containerEnv": {
-    "PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.ghcup/bin"
-  },
   "remoteEnv": {
     "PATH": "${containerEnv:PATH}:${containerEnv:HOME}/.ghcup/bin"
   }
