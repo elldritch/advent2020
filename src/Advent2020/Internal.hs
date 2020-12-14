@@ -21,6 +21,7 @@ module Advent2020.Internal
     windows,
     smallest,
     largest,
+    min',
     fixed,
   )
 where
@@ -154,6 +155,10 @@ smallest xs = foldr min (head xs) xs
 -- | Returns the largest element of the list.
 largest :: (Ord a) => NonEmpty a -> a
 largest xs = foldr max (head xs) xs
+
+-- | 'min', but project the value to compare on.
+min' :: (Ord b) => (a -> b) -> a -> a -> a
+min' f a b = if f a < f b then a else b
 
 -- | Find the fixed point of a function given an initial argument.
 fixed :: (Eq a) => (a -> a) -> a -> a
