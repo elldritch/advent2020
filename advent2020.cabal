@@ -9,6 +9,7 @@ common lang
   default-extensions:
     NoImplicitPrelude
     Arrows
+    BinaryLiterals
     ConstraintKinds
     DataKinds
     DefaultSignatures
@@ -46,6 +47,7 @@ library
     Advent2020.D11
     Advent2020.D12
     Advent2020.D13
+    Advent2020.D14
     Advent2020.D2
     Advent2020.D3
     Advent2020.D4
@@ -59,6 +61,7 @@ library
     Advent2020.Internal.D11
     Advent2020.Internal.D12
     Advent2020.Internal.D13
+    Advent2020.Internal.D14
     Advent2020.Internal.D2
     Advent2020.Internal.D3
     Advent2020.Internal.D4
@@ -88,6 +91,7 @@ test-suite tests
     Advent2020.D11Spec
     Advent2020.D12Spec
     Advent2020.D13Spec
+    Advent2020.D14Spec
     Advent2020.D1Spec
     Advent2020.D2Spec
     Advent2020.D3Spec
