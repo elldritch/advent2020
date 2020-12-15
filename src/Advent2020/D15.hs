@@ -4,8 +4,8 @@ import Advent2020.Internal (simpleRun')
 import Advent2020.Internal.D15 (nth, parse, spoken)
 import Relude
 
-run :: ([Integer] -> Integer) -> Text -> Either Text Int
-run = simpleRun' parse (return . fromInteger)
+run :: ([Integer] -> Integer) -> Text -> Either Text Integer
+run = simpleRun' parse return
 
 part1 :: [Integer] -> Integer
 part1 = nth 2020 . spoken
