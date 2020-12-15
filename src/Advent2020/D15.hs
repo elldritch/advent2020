@@ -1,12 +1,14 @@
-module Advent2020.D15 (run, part1) where
+module Advent2020.D15 (run, part1, part2) where
 
 import Advent2020.Internal (simpleRun')
-import Advent2020.Internal.D15 (Game (..), parse, spoken)
+import Advent2020.Internal.D15 (nth, parse, spoken)
 import Relude
-import Relude.Unsafe (fromJust)
 
-run :: ([Int] -> Int) -> Text -> Either Text Int
-run = simpleRun' parse return
+run :: ([Integer] -> Integer) -> Text -> Either Text Int
+run = simpleRun' parse (return . fromInteger)
 
-part1 :: [Int] -> Int
-part1 = next . fromJust . find ((2020 ==) . currentTurn) . spoken
+part1 :: [Integer] -> Integer
+part1 = nth 2020 . spoken
+
+part2 :: [Integer] -> Integer
+part2 = nth 30000000 . spoken

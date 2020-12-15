@@ -2,6 +2,7 @@ module Advent2020.Internal.D15
   ( parse,
     Game (..),
     spoken,
+    nth,
   )
 where
 
@@ -12,17 +13,17 @@ import Relude.Unsafe (fromJust)
 import Text.Megaparsec (eof, someTill)
 import Text.Megaparsec.Char (char, digitChar, newline)
 
-parse :: Text -> Either Text [Int]
-parse = parseWithPrettyErrors $ parseWith readInt (digitChar `someTill` (char ',' <|> newline)) `someTill` eof
+parse :: Text -> Either Text [Integer]
+parse = parseWithPrettyErrors $ parseWith (readInt >=> return . toInteger) (digitChar `someTill` (char ',' <|> newline)) `someTill` eof
 
 data Game = Game
-  { turnLastSpoken :: Map Int Int,
-    next :: Int,
-    currentTurn :: Int
+  { turnLastSpoken :: Map Integer Integer,
+    next :: Integer,
+    currentTurn :: Integer
   }
   deriving (Show)
 
-spoken :: [Int] -> [Game]
+spoken :: [Integer] -> [Game]
 spoken starting = iterate speak startingGame
   where
     starting' = fromJust $ nonEmpty $ zip [1 ..] starting
@@ -45,3 +46,6 @@ speak g@Game {..} = case lookup next turnLastSpoken of
         { currentTurn = currentTurn + 1,
           turnLastSpoken = insert next currentTurn turnLastSpoken
         }
+
+nth :: Integer -> [Game] -> Integer
+nth n = next . fromJust . find ((== n) . currentTurn)
