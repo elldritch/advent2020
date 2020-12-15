@@ -12,7 +12,7 @@ module Advent2020.Internal.D14
   )
 where
 
-import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt, tracePrefix, traceWith)
+import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
 import Data.Bits (clearBit, setBit, shift, (.&.), (.|.))
 import Data.Map (insert)
 import Relude

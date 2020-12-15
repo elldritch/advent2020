@@ -6,7 +6,7 @@ module Advent2020.Internal.D13
   )
 where
 
-import Advent2020.Internal (min', parseWith, parseWithPrettyErrors, readInt, traceWith)
+import Advent2020.Internal (min', parseWith, parseWithPrettyErrors, readInt)
 import Math.NumberTheory.Moduli.Chinese (chinese)
 import Relude
 import Relude.Unsafe (fromJust)
