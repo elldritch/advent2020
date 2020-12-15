@@ -1,13 +1,14 @@
-module Advent2020.D14 (run, part1) where
+module Advent2020.D14 (run, part1, part2) where
 
-import Advent2020.Internal (simpleRun)
-import Advent2020.Internal.D14 (Machine (..), Program, execute, parse)
+import Advent2020.Internal (simpleRun')
+import Advent2020.Internal.D14 (BitMask, DecodeMask, Machine (..), Program, execute, parse, step, step')
 import Relude
 
-run :: (Program -> Either Text Int) -> Text -> Either Text Int
-run = simpleRun parse
+run :: (Program -> Machine m) -> Text -> Either Text Int
+run = simpleRun' parse (return . fromInteger . sum . memory)
 
-part1 :: Program -> Either Text Int
-part1 p = do
-  let Machine {..} = execute p
-  return $ fromInteger $ sum memory
+part1 :: Program -> Machine BitMask
+part1 = execute step
+
+part2 :: Program -> Machine DecodeMask
+part2 = execute step'
