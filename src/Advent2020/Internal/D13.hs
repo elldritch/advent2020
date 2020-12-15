@@ -2,10 +2,12 @@ module Advent2020.Internal.D13
   ( Schedule (..),
     parse,
     earliestBusAfter,
+    chinese',
   )
 where
 
-import Advent2020.Internal (min', parseWith, parseWithPrettyErrors, readInt)
+import Advent2020.Internal (min', parseWith, parseWithPrettyErrors, readInt, traceWith)
+import Math.NumberTheory.Moduli.Chinese (chinese)
 import Relude
 import Relude.Unsafe (fromJust)
 import Text.Megaparsec (eof, someTill)
@@ -33,3 +35,11 @@ earliestBusAfter ready buses = foldr (min' snd) (head firstDepartureAfter) first
 
     firstDepartureAfter :: NonEmpty (Int, Int)
     firstDepartureAfter = second (fromJust . find (> ready)) <$> busDepartures
+
+chinese' :: NonEmpty (Integer, Integer) -> Maybe (Integer, Integer)
+chinese' ((n, m) :| []) = Just (n, m)
+chinese' (x :| xt) = foldlM f x xt
+  where
+    f (nAcc, mAcc) (n, m) = do
+      n' <- chinese (nAcc, mAcc) (n, m)
+      return (n', mAcc * m)

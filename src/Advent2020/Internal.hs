@@ -1,5 +1,6 @@
 module Advent2020.Internal
   ( traceWith,
+    tracePrefix,
     readInt,
     map',
     mapE,
@@ -36,6 +37,11 @@ import Text.Megaparsec.Char (digitChar, newline)
 {-# WARNING traceWith "'traceWith' remains in code" #-}
 traceWith :: (a -> Text) -> a -> a
 traceWith f x = trace (toString $ f x) x
+
+-- | 'trace' a message derived from the traced value.
+{-# WARNING tracePrefix "'tracePrefix' remains in code" #-}
+tracePrefix :: (Show a) => Text -> a -> a
+tracePrefix msg x = trace (toString $ msg <> ": " <> show x) x
 
 -- | 'readEither' specialized to integers, with clearer error message.
 readInt :: (ToString s) => s -> Either Text Int
