@@ -1,10 +1,9 @@
 module Advent2020.D16Spec (spec) where
 
-import Advent2020.Internal.D16 (Rules, Ticket, parse)
+import Advent2020.Internal.D16 (Rules, Ticket, invalidTickets, parse)
 import Advent2020.Spec.Internal (shouldBe')
 import Relude
-import Test.Hspec (Spec, it)
-import Advent2020.D16 (part1)
+import Test.Hspec (Spec, it, shouldBe)
 
 exampleInput :: Text
 exampleInput =
@@ -43,10 +42,17 @@ exampleOtherTickets =
     fromList [("0", 38), ("1", 6), ("2", 12)]
   ]
 
+exampleInvalidTickets :: [(Ticket, Set Text)]
+exampleInvalidTickets =
+  [ (fromList [("0", 40), ("1", 4), ("2", 50)], one "1"),
+    (fromList [("0", 55), ("1", 2), ("2", 20)], one "0"),
+    (fromList [("0", 38), ("1", 6), ("2", 12)], one "2")
+  ]
+
 spec :: Spec
 spec = do
   it "parses ticket notes" $ do
     parse exampleInput `shouldBe'` (exampleRules, exampleTicket, exampleOtherTickets)
 
   it "detects fields that can never possibly be valid" $ do
-    part1 (exampleRules, error "should not read own ticket", exampleOtherTickets) `shouldBe'` 71
+    invalidTickets exampleRules exampleOtherTickets `shouldBe` exampleInvalidTickets

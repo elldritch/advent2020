@@ -1,8 +1,10 @@
-module Advent2020.Internal.D16 (Range, Rules, Ticket, parse) where
+module Advent2020.Internal.D16 (Range, Rules, Ticket, parse, invalidTickets) where
 
 import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
+import Data.Map (foldrWithKey)
+import Data.Set (union)
 import Relude
-import Text.Megaparsec (try, eof, chunk, someTill, someTill_)
+import Text.Megaparsec (chunk, eof, someTill, someTill_, try)
 import Text.Megaparsec.Char (char, digitChar, letterChar, newline, spaceChar)
 
 type Range = (Int, Int)
@@ -42,3 +44,20 @@ parse = parseWithPrettyErrors $ do
       where
         fieldP = parseWith readInt $ digitChar `someTill` char ','
         lastFieldP = parseWith readInt $ digitChar `someTill` newline
+
+invalidTickets :: Rules -> [Ticket] -> [(Ticket, Set Text)]
+invalidTickets rules = foldl' collectInvalidTickets []
+  where
+    withinRange :: Range -> Int -> Bool
+    withinRange (low, high) x = x >= low && x <= high
+
+    canBeValid :: Int -> Bool
+    canBeValid x = or $ (\ranges -> or $ (`withinRange` x) <$> ranges) <$> toList rules
+
+    invalidFields :: Ticket -> Set Text
+    invalidFields ticket = foldrWithKey (\k v fs -> union fs $ if canBeValid v then mempty else one k) mempty ticket
+
+    collectInvalidTickets :: [(Ticket, Set Text)] -> Ticket -> [(Ticket, Set Text)]
+    collectInvalidTickets acc ticket = acc ++ [(ticket, fs) | not (null fs)]
+      where
+        fs = invalidFields ticket

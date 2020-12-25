@@ -18,6 +18,7 @@ Running the auto-formatter:
 
 ```
 cabal-fmt --inplace advent2020.cabal
+ormolu -i $(find . -path ./dist-newstyle -prune -false -o -name '*.hs')
 ```
 
 Running tests:
