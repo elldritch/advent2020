@@ -24,7 +24,7 @@ type Position = (Int, Int, Int)
 type Hyperposition = (Int, Int, Int, Int)
 
 newtype Pocket t = Pocket {activeCubes :: Set t}
-  deriving (Show, Eq, Ord)
+  deriving (Show, Eq)
 
 numCubes :: (Ord t) => Pocket t -> Int
 numCubes (Pocket actives) = size actives
