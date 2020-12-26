@@ -6,7 +6,7 @@ module Advent2020.Internal.D15
   )
 where
 
-import Advent2020.Internal (parseWith, parseWithPrettyErrors, readInt, unsafeNonEmpty)
+import Advent2020.Internal (parseWith, parseWithPrettyErrors, readInt', unsafeNonEmpty)
 import Control.Monad.Combinators.NonEmpty (someTill)
 import Relude
 import Relude.Extra.Map
@@ -18,7 +18,7 @@ parse :: Text -> Either Text (NonEmpty Integer)
 parse =
   parseWithPrettyErrors $
     parseWith
-      (readInt >=> return . toInteger)
+      readInt'
       (toList <$> (digitChar `someTill` (char ',' <|> newline)))
       `someTill` eof
 

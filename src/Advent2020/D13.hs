@@ -3,7 +3,6 @@ module Advent2020.D13 (run, part1, part2) where
 import Advent2020.Internal (simpleRun)
 import Advent2020.Internal.D13 (Schedule (..), chinese', earliestBusAfter, parse)
 import Relude
-import Relude.Extra.Bifunctor (bimapBoth)
 import qualified Relude.Unsafe as Unsafe
 
 run :: (Schedule -> Either Text t) -> Text -> Either Text t
@@ -26,8 +25,8 @@ part1 Schedule {..} = do
 part2 :: Schedule -> Either Text Integer
 part2 Schedule {..} = do
   offsets' <- maybeToRight "no buses in service" $ nonEmpty offsets
-  (n, m) <- maybeToRight "no such timestamp (buses are periodic)" $ chinese' $ bimapBoth toInteger <$> offsets'
+  (n, m) <- maybeToRight "no such timestamp (buses are periodic)" $ chinese' offsets'
   return $ if n >= 0 then n else m + n
   where
-    offsets :: [(Int, Int)]
-    offsets = second Unsafe.fromJust <$> filter (isJust . snd) (zip [0, -1 ..] buses)
+    offsets :: [(Integer, Integer)]
+    offsets = second (toInteger . Unsafe.fromJust) <$> filter (isJust . snd) (zip [0, -1 ..] buses)

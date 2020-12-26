@@ -12,7 +12,7 @@ module Advent2020.Internal.D14
   )
 where
 
-import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
+import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt')
 import Data.Bits (clearBit, setBit, shift, (.&.), (.|.))
 import Relude
 import Relude.Extra.Map
@@ -49,9 +49,9 @@ parse = parseWithPrettyErrors $ instructionP `someTill` eof
     setMemoryP :: Parser Instruction
     setMemoryP = do
       _ <- chunk "mem["
-      address <- toInteger <$> parseWith readInt (digitChar `someTill` char ']')
+      address <- parseWith readInt' (digitChar `someTill` char ']')
       _ <- chunk " = "
-      value <- toInteger <$> parseWith readInt (digitChar `someTill` newline)
+      value <- parseWith readInt' (digitChar `someTill` newline)
       return SetMemory {..}
 
 -- Machines are executions of programs.
