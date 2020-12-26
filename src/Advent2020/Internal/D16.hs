@@ -6,13 +6,12 @@ module Advent2020.Internal.D16
     FieldID (..),
     parse,
     invalidFields,
-    invalidTickets,
-    isValid,
     possibleFields,
   )
 where
 
 import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
+import qualified Control.Monad.Combinators.NonEmpty as NonEmpty
 import Data.Map (foldrWithKey, keys, unionWith)
 import qualified Data.Map as Map
 import Data.Set (insert, intersection, union)
@@ -30,16 +29,16 @@ newtype FieldName = FieldName {unFieldName :: Text} deriving (IsString, Eq, Ord,
 
 type Ticket = Map FieldID Int
 
-newtype FieldID = FieldID {unFieldID :: Text} deriving (IsString, Eq, Ord, Show)
+newtype FieldID = FieldID {unFieldID :: Int} deriving (Eq, Ord, Show)
 
-parse :: Text -> Either Text (Rules, Ticket, [Ticket])
+parse :: Text -> Either Text (Rules, Ticket, NonEmpty Ticket)
 parse = parseWithPrettyErrors $ do
   rules <- ruleP `someTill` newline
   _ <- chunk "your ticket:\n"
   mine <- ticketP
   _ <- newline
   _ <- chunk "nearby tickets:\n"
-  others <- ticketP `someTill` eof
+  others <- ticketP `NonEmpty.someTill` eof
   return (fromList rules, mine, others)
   where
     ruleP :: Parser (FieldName, [Range])
@@ -59,7 +58,7 @@ parse = parseWithPrettyErrors $ do
     ticketP :: Parser Ticket
     ticketP = do
       (fields, lastField) <- fieldP `someTill_` try lastFieldP
-      return $ fromList $ zip (show <$> ([0 ..] :: [Int])) $ fields ++ [lastField]
+      return $ fromList $ zip (FieldID <$> [0 ..]) $ fields ++ [lastField]
       where
         fieldP = parseWith readInt $ digitChar `someTill` char ','
         lastFieldP = parseWith readInt $ digitChar `someTill` newline
@@ -76,17 +75,6 @@ invalidFields rules = foldrWithKey (\fid v acc -> union acc $ if canBeValid v th
   where
     canBeValid :: Int -> Bool
     canBeValid x = or $ withinRule x <$> toList rules
-
-isValid :: Rules -> Ticket -> Bool
-isValid rules = null . invalidFields rules
-
-invalidTickets :: Rules -> [Ticket] -> [(Ticket, Set FieldID)]
-invalidTickets rules = foldl' collectInvalidTickets []
-  where
-    collectInvalidTickets :: [(Ticket, Set FieldID)] -> Ticket -> [(Ticket, Set FieldID)]
-    collectInvalidTickets acc ticket = acc ++ [(ticket, fs) | not (null fs)]
-      where
-        fs = invalidFields rules ticket
 
 possibleFields' :: Rules -> Ticket -> Map FieldID (Set FieldName)
 possibleFields' rs = Map.map possibleNamesOf

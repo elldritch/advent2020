@@ -7,7 +7,7 @@ module Advent2020.Internal.D15
 where
 
 import Advent2020.Internal (parseWith, parseWithPrettyErrors, readInt, unsafeNonEmpty)
-import Control.Applicative.Combinators.NonEmpty (someTill)
+import Control.Monad.Combinators.NonEmpty (someTill)
 import Data.Map (insert, lookup)
 import Relude
 import qualified Relude.Unsafe as Unsafe

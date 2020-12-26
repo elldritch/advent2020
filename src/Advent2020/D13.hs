@@ -16,7 +16,13 @@ part1 Schedule {..} = do
   let (busID, departureTime) = earliestBusAfter earliestDeparture bs
   return $ busID * (departureTime - earliestDeparture)
 
--- This problem reduces to the Chinese Remainder Theorem. See https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Existence_(constructive_proof).
+-- This problem reduces to the Chinese Remainder Theorem. See
+-- https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Existence_(constructive_proof).
+--
+-- NOTE: This only works because the bus IDs in the input happen to be pairwise
+-- coprime. In general, this does not work for arbitrary bus schedules. However,
+-- this problem is constructed such that a solution exists (which I suppose they
+-- imply by asking for a solution).
 part2 :: Schedule -> Either Text Integer
 part2 Schedule {..} = do
   offsets' <- maybeToRight "no buses in service" $ nonEmpty offsets

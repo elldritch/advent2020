@@ -108,13 +108,19 @@ main = do
         _ -> catchAll
       16 -> case part of
         1 -> runEitherPretty $ D16.run D16.part1
-        -- 2 -> runEitherPretty $ D16.run D16.part2
+        2 -> runEitherPretty' $ D16.run D16.part2
         _ -> catchAll
       _ -> catchAll
 
 runEitherPretty :: (Show t) => (Text -> Either Text t) -> Text -> IO ()
-runEitherPretty run contents = putTextLn $ case run contents of
-  Right r -> "OK: " <> show r
+runEitherPretty = runEitherPretty_ show
+
+runEitherPretty' :: (Text -> Either Text Text) -> Text -> IO ()
+runEitherPretty' = runEitherPretty_ id
+
+runEitherPretty_ :: (t -> Text) -> (Text -> Either Text t) -> Text -> IO ()
+runEitherPretty_ f run contents = putTextLn $ case run contents of
+  Right r -> "OK: " <> f r
   Left err -> "ERROR: " <> err
 
 catchAll :: a -> IO ()

@@ -28,7 +28,7 @@ module Advent2020.Internal
   )
 where
 
-import qualified Control.Applicative.Combinators.NonEmpty as NE (someTill)
+import qualified Control.Monad.Combinators.NonEmpty as NonEmpty
 import Data.Either.Extra (mapLeft)
 import Relude
 import Relude.Unsafe (fromJust)
@@ -115,7 +115,7 @@ parseWith' f v = case f v of
 
 -- | Parse newline-delimited numbers.
 parseNumbers :: Text -> Either Text (NonEmpty Int)
-parseNumbers = parseWithPrettyErrors $ parseWith readInt numberLineParser `NE.someTill` hidden eof
+parseNumbers = parseWithPrettyErrors $ parseWith readInt numberLineParser `NonEmpty.someTill` hidden eof
   where
     numberLineParser = digitChar `someTill` newline <?> "number"
 

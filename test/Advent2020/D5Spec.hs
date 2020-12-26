@@ -15,13 +15,13 @@ exampleInput =
       "BBFFBBFRLL"
     ]
 
-exampleSeatSpecs :: [SeatSpec]
+exampleSeatSpecs :: NonEmpty SeatSpec
 exampleSeatSpecs =
-  [ [F, B, F, B, B, F, F, R, L, R],
-    [B, F, F, F, B, B, F, R, R, R],
-    [F, F, F, B, B, B, F, R, R, R],
-    [B, B, F, F, B, B, F, R, L, L]
-  ]
+  [F, B, F, B, B, F, F, R, L, R]
+    :| [ [B, F, F, F, B, B, F, R, R, R],
+         [F, F, F, B, B, B, F, R, R, R],
+         [B, B, F, F, B, B, F, R, L, L]
+       ]
 
 exampleSeatPositions :: [Position Int]
 exampleSeatPositions =
@@ -40,7 +40,7 @@ spec = do
     parse exampleInput `shouldBe'` exampleSeatSpecs
 
   it "computes seat positions from specs" $ do
-    gather' (specToPosition <$> exampleSeatSpecs) `shouldBe'` exampleSeatPositions
+    gather' (toList $ specToPosition <$> exampleSeatSpecs) `shouldBe'` exampleSeatPositions
 
   it "computes seat IDs from positions" $ do
     seatID <$> exampleSeatPositions `shouldBe` exampleSeatIDs

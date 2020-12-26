@@ -9,8 +9,9 @@ module Advent2020.Internal.D5
 where
 
 import Advent2020.Internal (Parser, parseWithPrettyErrors)
+import Control.Monad.Combinators.NonEmpty (someTill)
 import Relude
-import Text.Megaparsec (count, eof, hidden, someTill)
+import Text.Megaparsec (count, eof, hidden)
 import Text.Megaparsec.Char (char, spaceChar)
 
 data Partition
@@ -22,7 +23,7 @@ data Partition
 
 type SeatSpec = [Partition]
 
-parse :: Text -> Either Text [SeatSpec]
+parse :: Text -> Either Text (NonEmpty SeatSpec)
 parse = parseWithPrettyErrors $ specParser `someTill` hidden eof
   where
     specParser :: Parser SeatSpec

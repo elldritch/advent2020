@@ -1,8 +1,8 @@
 module Advent2020.D16Spec (spec) where
 
-import Advent2020.Internal (unsafeNonEmpty)
-import Advent2020.Internal.D16 (FieldID (..), FieldName (..), Rules, Ticket, invalidTickets, parse, possibleFields)
+import Advent2020.Internal.D16 (FieldID (..), FieldName (..), Rules, Ticket, invalidFields, parse, possibleFields)
 import Advent2020.Spec.Internal (shouldBe')
+import qualified Data.List.NonEmpty as NonEmpty
 import Relude
 import Test.Hspec (Spec, it, shouldBe)
 
@@ -55,58 +55,53 @@ exampleRules2 =
       ("seat", [(0, 13), (16, 19)])
     ]
 
+ticket :: [(Int, Int)] -> Ticket
+ticket fs = fromList $ first FieldID <$> fs
+
+tickets' :: NonEmpty [(Int, Int)] -> NonEmpty Ticket
+tickets' ts = ticket <$> ts
+
 exampleTicket :: Ticket
-exampleTicket =
-  fromList [("0", 7), ("1", 1), ("2", 14)]
+exampleTicket = ticket [(0, 7), (1, 1), (2, 14)]
 
 exampleTicket2 :: Ticket
-exampleTicket2 =
-  fromList [("0", 11), ("1", 12), ("2", 13)]
+exampleTicket2 = ticket [(0, 11), (1, 12), (2, 13)]
 
-exampleOtherTickets :: [Ticket]
+exampleOtherTickets :: NonEmpty Ticket
 exampleOtherTickets =
-  [ fromList [("0", 7), ("1", 3), ("2", 47)],
-    fromList [("0", 40), ("1", 4), ("2", 50)],
-    fromList [("0", 55), ("1", 2), ("2", 20)],
-    fromList [("0", 38), ("1", 6), ("2", 12)]
-  ]
+  tickets' $
+    [(0, 7), (1, 3), (2, 47)]
+      :| [ [(0, 40), (1, 4), (2, 50)],
+           [(0, 55), (1, 2), (2, 20)],
+           [(0, 38), (1, 6), (2, 12)]
+         ]
 
-exampleOtherTickets2 :: [Ticket]
+exampleOtherTickets2 :: NonEmpty Ticket
 exampleOtherTickets2 =
-  [ fromList [("0", 3), ("1", 9), ("2", 18)],
-    fromList [("0", 15), ("1", 1), ("2", 5)],
-    fromList [("0", 5), ("1", 14), ("2", 9)]
-  ]
+  tickets' $
+    [(0, 3), (1, 9), (2, 18)]
+      :| [ [(0, 15), (1, 1), (2, 5)],
+           [(0, 5), (1, 14), (2, 9)]
+         ]
 
 exampleInvalidTickets :: [(Ticket, Set FieldID)]
 exampleInvalidTickets =
-  [ (fromList [("0", 40), ("1", 4), ("2", 50)], one "1"),
-    (fromList [("0", 55), ("1", 2), ("2", 20)], one "0"),
-    (fromList [("0", 38), ("1", 6), ("2", 12)], one "2")
+  [ (ticket [(0, 40), (1, 4), (2, 50)], one $ FieldID 1),
+    (ticket [(0, 55), (1, 2), (2, 20)], one $ FieldID 0),
+    (ticket [(0, 38), (1, 6), (2, 12)], one $ FieldID 2)
   ]
 
 examplePossibleFields :: Map FieldID (Set FieldName)
 examplePossibleFields =
   fromList
-    [ ( FieldID {unFieldID = "0"},
-        fromList
-          [ FieldName {unFieldName = "row"}
-          ]
-      ),
-      ( FieldID {unFieldID = "1"},
-        fromList
-          [ FieldName {unFieldName = "class"},
-            FieldName {unFieldName = "row"}
-          ]
-      ),
-      ( FieldID {unFieldID = "2"},
-        fromList
-          [ FieldName {unFieldName = "class"},
-            FieldName {unFieldName = "row"},
-            FieldName {unFieldName = "seat"}
-          ]
-      )
+    [ (FieldID 0, fromList ["row"]),
+      (FieldID 1, fromList ["class", "row"]),
+      (FieldID 2, fromList ["class", "row", "seat"])
     ]
+
+invalidTickets :: Rules -> NonEmpty Ticket -> [(Ticket, Set FieldID)]
+invalidTickets rules tickets =
+  NonEmpty.filter (not . null . snd) $ NonEmpty.zip tickets $ invalidFields rules <$> tickets
 
 spec :: Spec
 spec = do
@@ -119,4 +114,4 @@ spec = do
     invalidTickets exampleRules2 exampleOtherTickets2 `shouldBe` []
 
   it "determines possible field names" $ do
-    possibleFields exampleRules2 (unsafeNonEmpty exampleOtherTickets2) `shouldBe` examplePossibleFields
+    possibleFields exampleRules2 exampleOtherTickets2 `shouldBe` examplePossibleFields

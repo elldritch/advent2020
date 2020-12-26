@@ -1,24 +1,24 @@
 module Advent2020.D5 (run, part1, part2) where
 
-import Advent2020.Internal (gather', windows)
+import Advent2020.Internal (gather', largest, unsafeNonEmpty, windows)
 import Advent2020.Internal.D5 (Position (..), parse, seatID, specToPosition)
 import Data.Set (member)
 import Relude
 
-run :: ([Position Int] -> Either Text t) -> Text -> Either Text t
+run :: (NonEmpty (Position Int) -> Either Text t) -> Text -> Either Text t
 run runner contents = do
   specs <- parse contents
-  ps <- gather' $ specToPosition <$> specs
-  runner ps
+  ps <- gather' $ toList $ specToPosition <$> specs
+  runner $ unsafeNonEmpty ps
 
-part1 :: [Position Int] -> Either Text Int
-part1 ps = return $ foldr max 0 $ seatID <$> ps
+part1 :: NonEmpty (Position Int) -> Either Text Int
+part1 ps = return $ largest $ seatID <$> ps
 
-part2 :: [Position Int] -> Either Text Int
+part2 :: NonEmpty (Position Int) -> Either Text Int
 part2 ps = seatID <$> maybeToRight "could not find open seat" openSeat
   where
     occupied :: Set (Position Int)
-    occupied = fromList ps
+    occupied = fromList $ toList ps
 
     isOccupied :: Position Int -> Bool
     isOccupied p = member p occupied
