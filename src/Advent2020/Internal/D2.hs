@@ -4,16 +4,16 @@ module Advent2020.Internal.D2
   )
 where
 
-import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
+import Advent2020.Internal (Parser, integralP, parseWithPrettyErrors, symbol, wordP)
 import Relude
-import Text.Megaparsec (chunk, eof, hidden, label, someTill, (<?>))
-import Text.Megaparsec.Char (char, digitChar, letterChar, newline, spaceChar)
+import Text.Megaparsec (eof, hidden, someTill, (<?>))
+import Text.Megaparsec.Char (letterChar, newline)
 
 data Password = Password
   { a :: Int,
     b :: Int,
     letter :: Char,
-    password :: String
+    password :: Text
   }
   deriving (Show, Eq)
 
@@ -22,9 +22,11 @@ parse = parseWithPrettyErrors $ parser `someTill` hidden eof
 
 parser :: Parser Password
 parser = do
-  a <- parseWith readInt $ label "left number" $ digitChar `someTill` char '-'
-  b <- parseWith readInt $ label "right number" $ digitChar `someTill` spaceChar
+  a <- integralP <?> "left number"
+  _ <- symbol "-"
+  b <- integralP <?> "right number"
   letter <- letterChar <?> "letter"
-  _ <- chunk ": "
-  password <- letterChar `someTill` newline <?> "password"
+  _ <- symbol ":"
+  password <- wordP <?> "password"
+  _ <- newline
   return Password {..}

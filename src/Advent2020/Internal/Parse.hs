@@ -6,6 +6,10 @@ module Advent2020.Internal.Parse
     parseNumbers,
     readInt,
     readInt',
+    lexeme,
+    symbol,
+    integralP,
+    wordP,
   )
 where
 
@@ -13,7 +17,8 @@ import qualified Control.Monad.Combinators.NonEmpty as NonEmpty
 import Data.Either.Extra (mapLeft)
 import Relude
 import Text.Megaparsec (MonadParsec (eof, hidden), Parsec, errorBundlePretty, runParser, someTill, (<?>))
-import Text.Megaparsec.Char (digitChar, newline)
+import Text.Megaparsec.Char (digitChar, hspace, letterChar, newline)
+import qualified Text.Megaparsec.Char.Lexer as L
 
 -- | Parsers on 'Text' without custom error components. See the documentation
 -- for "Text.Megaparsec".
@@ -52,3 +57,15 @@ readInt' :: (ToString s) => s -> Either Text Integer
 readInt' s = mapLeft (const $ toText $ "could not parse as Integer: " ++ show s') $ readEither s'
   where
     s' = toString s
+
+lexeme :: Parser a -> Parser a
+lexeme = L.lexeme hspace
+
+symbol :: Text -> Parser Text
+symbol = L.symbol hspace
+
+integralP :: (Integral i) => Parser i
+integralP = L.signed hspace $ lexeme L.decimal
+
+wordP :: Parser Text
+wordP = toText <$> lexeme (some letterChar)

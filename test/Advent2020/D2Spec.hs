@@ -27,7 +27,7 @@ spec = do
     parse exampleInput `shouldBe'` examplePasswords
 
   it "determines valid passwords" $ do
-    part1 <$> examplePasswords `shouldBe` Right <$> [True, False, True]
+    part1 <$> examplePasswords `shouldBe` [True, False, True]
 
   it "determines Toboggan-valid passwords" $ do
-    part2 <$> examplePasswords `shouldBe` Right <$> [True, False, False]
+    part2 <$> examplePasswords `shouldBe` [True, False, False]
