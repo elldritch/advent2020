@@ -50,6 +50,7 @@ library
     Advent2020.D14
     Advent2020.D15
     Advent2020.D16
+    Advent2020.D17
     Advent2020.D2
     Advent2020.D3
     Advent2020.D4
@@ -66,6 +67,7 @@ library
     Advent2020.Internal.D14
     Advent2020.Internal.D15
     Advent2020.Internal.D16
+    Advent2020.Internal.D17
     Advent2020.Internal.D2
     Advent2020.Internal.D3
     Advent2020.Internal.D4
@@ -99,6 +101,7 @@ test-suite tests
     Advent2020.D14Spec
     Advent2020.D15Spec
     Advent2020.D16Spec
+    Advent2020.D17Spec
     Advent2020.D1Spec
     Advent2020.D2Spec
     Advent2020.D3Spec

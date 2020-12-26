@@ -10,10 +10,9 @@ where
 
 import Advent2020.Internal (parseWithPrettyErrors)
 import Data.List (delete, groupBy)
-import Data.Map (assocs, mapWithKey)
+import Data.Map (assocs, lookup, mapWithKey)
 import GHC.Show (Show (..))
 import Relude hiding (show)
-import Relude.Extra.Map (lookup)
 import qualified Relude.Unsafe as Unsafe
 import Text.Megaparsec (eof, someTill)
 import Text.Megaparsec.Char (char, newline)

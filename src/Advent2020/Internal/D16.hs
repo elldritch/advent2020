@@ -92,7 +92,7 @@ possibleFieldNames :: Rules -> NonEmpty Ticket -> Map FieldID (Set FieldName)
 possibleFieldNames rules tickets = foldr intersectPossibleFields allFieldsPossible tickets
   where
     allFieldsPossible :: Map FieldID (Set FieldName)
-    allFieldsPossible = Map.map (const $ fromList $ keys rules) $ head tickets
+    allFieldsPossible = fromList (keys rules) <$ head tickets
 
     intersectPossibleFields :: Ticket -> Map FieldID (Set FieldName) -> Map FieldID (Set FieldName)
     intersectPossibleFields ticket fields = unionWith intersection (possibleFieldNames' rules ticket) fields
