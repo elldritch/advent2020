@@ -1,6 +1,6 @@
 module Advent2020.D16Spec (spec) where
 
-import Advent2020.Internal.D16 (FieldID (..), FieldName (..), Rules, Ticket, invalidFields, parse, possibleFields)
+import Advent2020.Internal.D16 (FieldID (..), FieldName (..), Rules, Ticket, chooseNamesUntilAmbiguous, invalidFields, parse, possibleFieldNames)
 import Advent2020.Spec.Internal (shouldBe')
 import qualified Data.List.NonEmpty as NonEmpty
 import Relude
@@ -55,10 +55,10 @@ exampleRules2 =
       ("seat", [(0, 13), (16, 19)])
     ]
 
-ticket :: [(Int, Int)] -> Ticket
-ticket fs = fromList $ first FieldID <$> fs
+ticket :: [(Int, Integer)] -> Ticket
+ticket fields = fromList $ first FieldID <$> fields
 
-tickets' :: NonEmpty [(Int, Int)] -> NonEmpty Ticket
+tickets' :: NonEmpty [(Int, Integer)] -> NonEmpty Ticket
 tickets' ts = ticket <$> ts
 
 exampleTicket :: Ticket
@@ -99,6 +99,14 @@ examplePossibleFields =
       (FieldID 2, fromList ["class", "row", "seat"])
     ]
 
+exampleFieldChoices :: Map FieldID FieldName
+exampleFieldChoices =
+  fromList
+    [ (FieldID 0, "row"),
+      (FieldID 1, "class"),
+      (FieldID 2, "seat")
+    ]
+
 invalidTickets :: Rules -> NonEmpty Ticket -> [(Ticket, Set FieldID)]
 invalidTickets rules tickets =
   NonEmpty.filter (not . null . snd) $ NonEmpty.zip tickets $ invalidFields rules <$> tickets
@@ -114,4 +122,7 @@ spec = do
     invalidTickets exampleRules2 exampleOtherTickets2 `shouldBe` []
 
   it "determines possible field names" $ do
-    possibleFields exampleRules2 exampleOtherTickets2 `shouldBe` examplePossibleFields
+    possibleFieldNames exampleRules2 exampleOtherTickets2 `shouldBe` examplePossibleFields
+
+  it "makes non-ambiguous field name choices" $ do
+    chooseNamesUntilAmbiguous exampleRules2 exampleOtherTickets2 `shouldBe` exampleFieldChoices

@@ -2,6 +2,7 @@ module Advent2020.Internal
   ( traceWith,
     tracePrefix,
     readInt,
+    readInt',
     map',
     mapE,
     mapE',
@@ -45,9 +46,15 @@ traceWith f x = trace (toString $ f x) x
 tracePrefix :: (Show a) => Text -> a -> a
 tracePrefix msg x = trace (toString $ msg <> ": " <> show x) x
 
--- | 'readEither' specialized to integers, with clearer error message.
+-- | 'readEither' specialized to '@Int@'s, with clearer error message.
 readInt :: (ToString s) => s -> Either Text Int
-readInt s = mapLeft (const $ toText $ "could not parse as integer: " ++ show s') $ readEither s'
+readInt s = mapLeft (const $ toText $ "could not parse as Int: " ++ show s') $ readEither s'
+  where
+    s' = toString s
+
+-- | 'readEither' specialized to '@Integer@'s, with clearer error message.
+readInt' :: (ToString s) => s -> Either Text Integer
+readInt' s = mapLeft (const $ toText $ "could not parse as Integer: " ++ show s') $ readEither s'
   where
     s' = toString s
 

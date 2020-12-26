@@ -6,20 +6,23 @@ module Advent2020.Internal.D16
     FieldID (..),
     parse,
     invalidFields,
-    possibleFields,
+    possibleFieldNames,
+    chooseNamesUntilAmbiguous,
   )
 where
 
-import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
+import Advent2020.Internal (Parser, fixed, parseWith, parseWithPrettyErrors, readInt', unsafeNonEmpty)
 import qualified Control.Monad.Combinators.NonEmpty as NonEmpty
-import Data.Map (foldrWithKey, keys, unionWith)
+import Data.Map (foldrWithKey, unionWith)
 import qualified Data.Map as Map
-import Data.Set (insert, intersection, union)
+import Data.Set (intersection, union, (\\))
+import qualified Data.Set as Set
 import Relude
+import Relude.Extra
 import Text.Megaparsec (chunk, eof, someTill, someTill_, try)
 import Text.Megaparsec.Char (char, digitChar, letterChar, newline, spaceChar)
 
-type Range = (Int, Int)
+type Range = (Integer, Integer)
 
 type Rule = [Range]
 
@@ -27,7 +30,7 @@ type Rules = Map FieldName Rule
 
 newtype FieldName = FieldName {unFieldName :: Text} deriving (IsString, Eq, Ord, Show)
 
-type Ticket = Map FieldID Int
+type Ticket = Map FieldID Integer
 
 newtype FieldID = FieldID {unFieldID :: Int} deriving (Eq, Ord, Show)
 
@@ -51,8 +54,8 @@ parse = parseWithPrettyErrors $ do
 
     rangeP :: Parser Range
     rangeP = do
-      low <- parseWith readInt $ digitChar `someTill` char '-'
-      high <- parseWith readInt $ digitChar `someTill` spaceChar
+      low <- parseWith readInt' $ digitChar `someTill` char '-'
+      high <- parseWith readInt' $ digitChar `someTill` spaceChar
       return (low, high)
 
     ticketP :: Parser Ticket
@@ -60,36 +63,55 @@ parse = parseWithPrettyErrors $ do
       (fields, lastField) <- fieldP `someTill_` try lastFieldP
       return $ fromList $ zip (FieldID <$> [0 ..]) $ fields ++ [lastField]
       where
-        fieldP = parseWith readInt $ digitChar `someTill` char ','
-        lastFieldP = parseWith readInt $ digitChar `someTill` newline
+        fieldP = parseWith readInt' $ digitChar `someTill` char ','
+        lastFieldP = parseWith readInt' $ digitChar `someTill` newline
 
 -- | Returns true if the integer is within one of the ranges of the rule. Use infix as 'n `withinRange` rule'.
-withinRule :: Int -> Rule -> Bool
+withinRule :: Integer -> Rule -> Bool
 withinRule n = or . fmap (withinRange n)
 
-withinRange :: Int -> Range -> Bool
+withinRange :: Integer -> Range -> Bool
 withinRange n (low, high) = n >= low && n <= high
 
 invalidFields :: Rules -> Ticket -> Set FieldID
 invalidFields rules = foldrWithKey (\fid v acc -> union acc $ if canBeValid v then mempty else one fid) mempty
   where
-    canBeValid :: Int -> Bool
+    canBeValid :: Integer -> Bool
     canBeValid x = or $ withinRule x <$> toList rules
 
-possibleFields' :: Rules -> Ticket -> Map FieldID (Set FieldName)
-possibleFields' rs = Map.map possibleNamesOf
+possibleFieldNames' :: Rules -> Ticket -> Map FieldID (Set FieldName)
+possibleFieldNames' rules = fmap possibleNamesForValue
   where
-    possibleNamesOf :: Int -> Set FieldName
-    possibleNamesOf n = foldrWithKey (accumulatePossibleNames n) mempty rs
+    possibleNamesForValue :: Integer -> Set FieldName
+    possibleNamesForValue n = foldrWithKey (accumulatePossibleNames n) mempty rules
 
-    accumulatePossibleNames :: Int -> FieldName -> Rule -> Set FieldName -> Set FieldName
-    accumulatePossibleNames n field rule acc = if n `withinRule` rule then insert field acc else acc
+    accumulatePossibleNames :: Integer -> FieldName -> Rule -> Set FieldName -> Set FieldName
+    accumulatePossibleNames n field rule acc = if n `withinRule` rule then Set.insert field acc else acc
 
-possibleFields :: Rules -> NonEmpty Ticket -> Map FieldID (Set FieldName)
-possibleFields rs ts = foldr intersectPossibleFields allFieldsPossible ts
+possibleFieldNames :: Rules -> NonEmpty Ticket -> Map FieldID (Set FieldName)
+possibleFieldNames rules tickets = foldr intersectPossibleFields allFieldsPossible tickets
   where
     allFieldsPossible :: Map FieldID (Set FieldName)
-    allFieldsPossible = Map.map (const $ fromList $ keys rs) $ head ts
+    allFieldsPossible = Map.map (const $ fromList $ keys rules) $ head tickets
 
     intersectPossibleFields :: Ticket -> Map FieldID (Set FieldName) -> Map FieldID (Set FieldName)
-    intersectPossibleFields t fs = unionWith intersection (possibleFields' rs t) fs
+    intersectPossibleFields ticket fields = unionWith intersection (possibleFieldNames' rules ticket) fields
+
+chooseNamesUntilAmbiguous :: Rules -> NonEmpty Ticket -> Map FieldID FieldName
+chooseNamesUntilAmbiguous rules tickets = fixed (narrow possible) mempty
+  where
+    possible = possibleFieldNames rules tickets
+
+    narrow :: Map FieldID (Set FieldName) -> Map FieldID FieldName -> Map FieldID FieldName
+    narrow possibilities choices = case nextChoice of
+      Nothing -> choices
+      Just (fieldID, fieldName) -> insert fieldID (head $ unsafeNonEmpty $ toList fieldName) choices
+      where
+        chosen :: Set FieldName
+        chosen = fromList $ elems choices
+
+        possibilities' :: Map FieldID (Set FieldName)
+        possibilities' = (\\ chosen) <$> possibilities
+
+        nextChoice :: Maybe (FieldID, Set FieldName)
+        nextChoice = find ((== 1) . size . snd) (Map.toList possibilities')

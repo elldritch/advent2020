@@ -82,6 +82,7 @@ library
     , extra               ==1.7.8
     , megaparsec          ==9.0.1
     , parser-combinators  ==1.2.1
+    , text                ==1.2.4.0
 
 test-suite tests
   import:         lang
