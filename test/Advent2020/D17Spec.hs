@@ -1,11 +1,9 @@
 module Advent2020.D17Spec (spec) where
 
-import Advent2020.Internal (unsafeNonEmpty)
-import Advent2020.Internal.D17 (Pocket (..), parse, step)
+import Advent2020.Internal.D17 (Hyperposition, Pocket (..), Position, numCubes, parse, parse', stepN, stepN')
 import Advent2020.Spec.Internal (shouldBe')
 import Relude
-import Relude.Extra.Map
-import Test.Hspec (Spec, it, shouldBe)
+import Test.Hspec (Spec, describe, it, shouldBe)
 
 exampleInput :: Text
 exampleInput =
@@ -15,8 +13,19 @@ exampleInput =
       "###"
     ]
 
-examplePocket :: Pocket
+examplePocket :: Pocket Position
 examplePocket = Pocket $ fromList $ (\(x, y) -> (x, y, 0)) <$> actives
+  where
+    actives =
+      [ (1, 0),
+        (2, 1),
+        (0, 2),
+        (1, 2),
+        (2, 2)
+      ]
+
+exampleHyperpocket :: Pocket Hyperposition
+exampleHyperpocket = Pocket $ fromList $ (\(x, y) -> (x, y, 0, 0)) <$> actives
   where
     actives =
       [ (1, 0),
@@ -28,9 +37,16 @@ examplePocket = Pocket $ fromList $ (\(x, y) -> (x, y, 0)) <$> actives
 
 spec :: Spec
 spec = do
-  it "parses pocket dimension slices" $ do
-    parse exampleInput `shouldBe'` examplePocket
+  describe "3-space pocket dimensions" $ do
+    it "parses pocket dimension slices" $ do
+      parse exampleInput `shouldBe'` examplePocket
 
-  it "simulates pocket dimension steps" $ do
-    let result = head $ unsafeNonEmpty $ drop 6 $ iterate step examplePocket
-    size (activeCubes result) `shouldBe` 112
+    it "simulates pocket dimension steps" $ do
+      numCubes (stepN 6 examplePocket) `shouldBe` 112
+
+  describe "4-space pocket dimensions" $ do
+    it "parses pocket dimension slices" $ do
+      parse' exampleInput `shouldBe'` exampleHyperpocket
+
+    it "simulates pocket dimension steps" $ do
+      numCubes (stepN' 6 exampleHyperpocket) `shouldBe` 848

@@ -1,12 +1,15 @@
-module Advent2020.D17 (run, part1) where
+module Advent2020.D17 (run, part1, part2) where
 
-import Advent2020.Internal (simpleRun, unsafeNonEmpty)
-import Advent2020.Internal.D17 (Pocket (..), parse, step)
+import Advent2020.Internal.D17 (Hyperposition, Pocket (..), Position, numCubes, parse, parse', stepN, stepN')
 import Relude
-import Relude.Extra.Map
 
-run :: (Pocket -> Either Text output) -> Text -> Either Text output
-run = simpleRun parse
+run :: (Ord t) => (Text -> Either Text (Pocket t), Int -> Pocket t -> Pocket t) -> Text -> Either Text Int
+run (parser, stepper) contents = do
+  pocket <- parser contents
+  return $ numCubes $ stepper 6 pocket
 
-part1 :: Pocket -> Either Text Int
-part1 = return . size . activeCubes . head . unsafeNonEmpty . drop 6 . iterate step
+part1 :: (Text -> Either Text (Pocket Position), Int -> Pocket Position -> Pocket Position)
+part1 = (parse, stepN)
+
+part2 :: (Text -> Either Text (Pocket Hyperposition), Int -> Pocket Hyperposition -> Pocket Hyperposition)
+part2 = (parse', stepN')
