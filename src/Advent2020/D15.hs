@@ -4,11 +4,11 @@ import Advent2020.Internal (simpleRun')
 import Advent2020.Internal.D15 (nth, parse, spoken)
 import Relude
 
-run :: ([Integer] -> Integer) -> Text -> Either Text Integer
+run :: (NonEmpty Integer -> Integer) -> Text -> Either Text Integer
 run = simpleRun' parse return
 
-part1 :: [Integer] -> Integer
+part1 :: NonEmpty Integer -> Integer
 part1 = nth 2020 . spoken
 
-part2 :: [Integer] -> Integer
+part2 :: NonEmpty Integer -> Integer
 part2 = nth 30000000 . spoken

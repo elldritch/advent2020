@@ -24,12 +24,14 @@ module Advent2020.Internal
     largest,
     min',
     fixed,
+    unsafeNonEmpty,
   )
 where
 
 import qualified Control.Applicative.Combinators.NonEmpty as NE (someTill)
 import Data.Either.Extra (mapLeft)
 import Relude
+import Relude.Unsafe (fromJust)
 import Text.Megaparsec (Parsec, eof, errorBundlePretty, hidden, runParser, someTill, (<?>))
 import Text.Megaparsec.Char (digitChar, newline)
 
@@ -173,3 +175,7 @@ fixed f a
   | otherwise = fixed f a'
   where
     a' = f a
+
+-- | Transform a list into its nonempty equivalent. Only use when safe by construction.
+unsafeNonEmpty :: [a] -> NonEmpty a
+unsafeNonEmpty = fromJust . nonEmpty

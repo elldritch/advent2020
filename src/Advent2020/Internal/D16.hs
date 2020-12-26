@@ -1,17 +1,36 @@
-module Advent2020.Internal.D16 (Range, Rules, Ticket, parse, invalidTickets) where
+module Advent2020.Internal.D16
+  ( Range,
+    Rules,
+    Ticket,
+    FieldName (..),
+    FieldID (..),
+    parse,
+    invalidFields,
+    invalidTickets,
+    isValid,
+    possibleFields,
+  )
+where
 
 import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
-import Data.Map (foldrWithKey)
-import Data.Set (union)
+import Data.Map (foldrWithKey, keys, unionWith)
+import qualified Data.Map as Map
+import Data.Set (insert, intersection, union)
 import Relude
 import Text.Megaparsec (chunk, eof, someTill, someTill_, try)
 import Text.Megaparsec.Char (char, digitChar, letterChar, newline, spaceChar)
 
 type Range = (Int, Int)
 
-type Rules = Map Text [Range]
+type Rule = [Range]
 
-type Ticket = Map Text Int
+type Rules = Map FieldName Rule
+
+newtype FieldName = FieldName {unFieldName :: Text} deriving (IsString, Eq, Ord, Show)
+
+type Ticket = Map FieldID Int
+
+newtype FieldID = FieldID {unFieldID :: Text} deriving (IsString, Eq, Ord, Show)
 
 parse :: Text -> Either Text (Rules, Ticket, [Ticket])
 parse = parseWithPrettyErrors $ do
@@ -23,13 +42,13 @@ parse = parseWithPrettyErrors $ do
   others <- ticketP `someTill` eof
   return (fromList rules, mine, others)
   where
-    ruleP :: Parser (Text, [Range])
+    ruleP :: Parser (FieldName, [Range])
     ruleP = do
       name <- toText <$> (letterChar <|> spaceChar) `someTill` chunk ": "
       r1 <- rangeP
       _ <- chunk "or "
       r2 <- rangeP
-      return (name, [r1, r2])
+      return (FieldName name, [r1, r2])
 
     rangeP :: Parser Range
     rangeP = do
@@ -45,19 +64,44 @@ parse = parseWithPrettyErrors $ do
         fieldP = parseWith readInt $ digitChar `someTill` char ','
         lastFieldP = parseWith readInt $ digitChar `someTill` newline
 
-invalidTickets :: Rules -> [Ticket] -> [(Ticket, Set Text)]
+-- | Returns true if the integer is within one of the ranges of the rule. Use infix as 'n `withinRange` rule'.
+withinRule :: Int -> Rule -> Bool
+withinRule n = or . fmap (withinRange n)
+
+withinRange :: Int -> Range -> Bool
+withinRange n (low, high) = n >= low && n <= high
+
+invalidFields :: Rules -> Ticket -> Set FieldID
+invalidFields rules = foldrWithKey (\fid v acc -> union acc $ if canBeValid v then mempty else one fid) mempty
+  where
+    canBeValid :: Int -> Bool
+    canBeValid x = or $ withinRule x <$> toList rules
+
+isValid :: Rules -> Ticket -> Bool
+isValid rules = null . invalidFields rules
+
+invalidTickets :: Rules -> [Ticket] -> [(Ticket, Set FieldID)]
 invalidTickets rules = foldl' collectInvalidTickets []
   where
-    withinRange :: Range -> Int -> Bool
-    withinRange (low, high) x = x >= low && x <= high
-
-    canBeValid :: Int -> Bool
-    canBeValid x = or $ (\ranges -> or $ (`withinRange` x) <$> ranges) <$> toList rules
-
-    invalidFields :: Ticket -> Set Text
-    invalidFields ticket = foldrWithKey (\k v fs -> union fs $ if canBeValid v then mempty else one k) mempty ticket
-
-    collectInvalidTickets :: [(Ticket, Set Text)] -> Ticket -> [(Ticket, Set Text)]
+    collectInvalidTickets :: [(Ticket, Set FieldID)] -> Ticket -> [(Ticket, Set FieldID)]
     collectInvalidTickets acc ticket = acc ++ [(ticket, fs) | not (null fs)]
       where
-        fs = invalidFields ticket
+        fs = invalidFields rules ticket
+
+possibleFields' :: Rules -> Ticket -> Map FieldID (Set FieldName)
+possibleFields' rs = Map.map possibleNamesOf
+  where
+    possibleNamesOf :: Int -> Set FieldName
+    possibleNamesOf n = foldrWithKey (accumulatePossibleNames n) mempty rs
+
+    accumulatePossibleNames :: Int -> FieldName -> Rule -> Set FieldName -> Set FieldName
+    accumulatePossibleNames n field rule acc = if n `withinRule` rule then insert field acc else acc
+
+possibleFields :: Rules -> NonEmpty Ticket -> Map FieldID (Set FieldName)
+possibleFields rs ts = foldr intersectPossibleFields allFieldsPossible ts
+  where
+    allFieldsPossible :: Map FieldID (Set FieldName)
+    allFieldsPossible = Map.map (const $ fromList $ keys rs) $ head ts
+
+    intersectPossibleFields :: Ticket -> Map FieldID (Set FieldName) -> Map FieldID (Set FieldName)
+    intersectPossibleFields t fs = unionWith intersection (possibleFields' rs t) fs

@@ -6,15 +6,21 @@ module Advent2020.Internal.D15
   )
 where
 
-import Advent2020.Internal (parseWith, parseWithPrettyErrors, readInt)
+import Advent2020.Internal (parseWith, parseWithPrettyErrors, readInt, unsafeNonEmpty)
+import Control.Applicative.Combinators.NonEmpty (someTill)
 import Data.Map (insert, lookup)
 import Relude
-import Relude.Unsafe (fromJust)
-import Text.Megaparsec (eof, someTill)
+import qualified Relude.Unsafe as Unsafe
+import Text.Megaparsec (eof)
 import Text.Megaparsec.Char (char, digitChar, newline)
 
-parse :: Text -> Either Text [Integer]
-parse = parseWithPrettyErrors $ parseWith (readInt >=> return . toInteger) (digitChar `someTill` (char ',' <|> newline)) `someTill` eof
+parse :: Text -> Either Text (NonEmpty Integer)
+parse =
+  parseWithPrettyErrors $
+    parseWith
+      (readInt >=> return . toInteger)
+      (toList <$> (digitChar `someTill` (char ',' <|> newline)))
+      `someTill` eof
 
 data Game = Game
   { turnLastSpoken :: Map Integer Integer,
@@ -23,10 +29,10 @@ data Game = Game
   }
   deriving (Show)
 
-spoken :: [Integer] -> [Game]
+spoken :: NonEmpty Integer -> [Game]
 spoken starting = iterate speak startingGame
   where
-    starting' = fromJust $ nonEmpty $ zip [1 ..] starting
+    starting' = unsafeNonEmpty $ zip [1 ..] $ toList starting
     (currentTurn', next') = last starting'
 
     startingGame =
@@ -48,4 +54,4 @@ speak g@Game {..} = case lookup next turnLastSpoken of
         }
 
 nth :: Integer -> [Game] -> Integer
-nth n = next . fromJust . find ((== n) . currentTurn)
+nth n = next . Unsafe.fromJust . find ((== n) . currentTurn)

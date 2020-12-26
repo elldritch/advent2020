@@ -9,7 +9,7 @@ where
 import Advent2020.Internal (min', parseWith, parseWithPrettyErrors, readInt)
 import Math.NumberTheory.Moduli.Chinese (chinese)
 import Relude
-import Relude.Unsafe (fromJust)
+import qualified Relude.Unsafe as Unsafe
 import Text.Megaparsec (eof, someTill)
 import Text.Megaparsec.Char (char, digitChar, newline)
 
@@ -34,7 +34,7 @@ earliestBusAfter ready buses = foldr (min' snd) (head firstDepartureAfter) first
     busDepartures = (\busID -> (busID, iterate (+ busID) 0)) <$> buses
 
     firstDepartureAfter :: NonEmpty (Int, Int)
-    firstDepartureAfter = second (fromJust . find (> ready)) <$> busDepartures
+    firstDepartureAfter = second (Unsafe.fromJust . find (> ready)) <$> busDepartures
 
 chinese' :: NonEmpty (Integer, Integer) -> Maybe (Integer, Integer)
 chinese' ((n, m) :| []) = Just (n, m)
