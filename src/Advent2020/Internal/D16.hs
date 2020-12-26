@@ -18,7 +18,7 @@ import qualified Data.Map as Map
 import Data.Set (intersection, union, (\\))
 import qualified Data.Set as Set
 import Relude
-import Relude.Extra
+import Relude.Extra.Map
 import Text.Megaparsec (chunk, eof, someTill, someTill_, try)
 import Text.Megaparsec.Char (char, digitChar, letterChar, newline, spaceChar)
 

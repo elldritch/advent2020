@@ -4,8 +4,8 @@ import Advent2020.Internal (gather', largest, runNumbers)
 import Advent2020.Internal.D10 (joltageDifferences)
 import Algebra.Graph.Acyclic.AdjacencyMap (AdjacencyMap, preSet, toAcyclic, topSort)
 import Algebra.Graph.AdjacencyMap (edges)
-import Data.Map (insert, lookup)
 import Relude
+import Relude.Extra.Map
 
 run :: (NonEmpty Int -> Either Text Int) -> Text -> Either Text Int
 run = runNumbers

@@ -10,8 +10,8 @@ where
 import Advent2020.Internal (Parser, parseWith, parseWith', parseWithPrettyErrors, readInt)
 import Data.Either.Extra (mapLeft)
 import Data.List.Extra (replace, trim)
-import Data.Map (lookup)
 import Relude
+import Relude.Extra.Map
 import Text.Megaparsec (ParseErrorBundle (..), count, eof, hidden, parseErrorTextPretty, runParser, someTill, someTill_)
 import Text.Megaparsec.Char (alphaNumChar, char, digitChar, hexDigitChar, letterChar, newline, spaceChar)
 

@@ -12,9 +12,10 @@ module Advent2020.Internal.D8
 where
 
 import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
-import Data.Set (insert, member)
+import qualified Data.Set as Set
 import GHC.Show (Show (..))
 import Relude hiding (show)
+import Relude.Extra.Map
 import Text.Megaparsec (chunk, eof, someTill)
 import Text.Megaparsec.Char (char, digitChar, newline)
 
@@ -100,6 +101,6 @@ runUntilFixed program = do
         Running ->
           if member programCounter seen
             then result
-            else takeUntilLoop (insert programCounter seen) es
+            else takeUntilLoop (Set.insert programCounter seen) es
         Terminated -> result
     takeUntilLoop _ [] = Left "impossible: iteration of program steps produced finite list"

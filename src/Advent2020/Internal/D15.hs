@@ -8,8 +8,8 @@ where
 
 import Advent2020.Internal (parseWith, parseWithPrettyErrors, readInt, unsafeNonEmpty)
 import Control.Monad.Combinators.NonEmpty (someTill)
-import Data.Map (insert, lookup)
 import Relude
+import Relude.Extra.Map
 import qualified Relude.Unsafe as Unsafe
 import Text.Megaparsec (eof)
 import Text.Megaparsec.Char (char, digitChar, newline)

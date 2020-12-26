@@ -14,8 +14,8 @@ where
 
 import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
 import Data.Bits (clearBit, setBit, shift, (.&.), (.|.))
-import Data.Map (insert)
 import Relude
+import Relude.Extra.Map
 import Text.Megaparsec (chunk, count, eof, someTill)
 import Text.Megaparsec.Char (char, digitChar, newline)
 

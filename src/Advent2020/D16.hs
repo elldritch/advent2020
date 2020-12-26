@@ -6,7 +6,7 @@ import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map as Map
 import qualified Data.Text as Text
 import Relude
-import Relude.Extra
+import Relude.Extra.Map
 
 run :: ((Rules, Ticket, NonEmpty Ticket) -> Either Text a) -> Text -> Either Text a
 run = simpleRun parse

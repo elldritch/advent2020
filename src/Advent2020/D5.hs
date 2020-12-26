@@ -2,8 +2,8 @@ module Advent2020.D5 (run, part1, part2) where
 
 import Advent2020.Internal (gather', largest, unsafeNonEmpty, windows)
 import Advent2020.Internal.D5 (Position (..), parse, seatID, specToPosition)
-import Data.Set (member)
 import Relude
+import Relude.Extra.Map
 
 run :: (NonEmpty (Position Int) -> Either Text t) -> Text -> Either Text t
 run runner contents = do
