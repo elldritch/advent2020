@@ -1,13 +1,13 @@
 module Advent2020.D2 (run, part1, part2) where
 
-import Advent2020.Internal (label, mapE')
+import Advent2020.Internal (label)
 import Advent2020.Internal.D2 (Password (..), parse)
 import Relude
 
 run :: (Password -> Either Text Bool) -> Text -> Either Text Int
 run isValid contents = do
   passwords <- label "parsing passwords" $ parse contents
-  valids <- label "computing valid passwords" $ mapE' isValid passwords
+  valids <- label "computing valid passwords" $ sequence $ isValid <$> passwords
   return $ sum $ fromEnum <$> valids
 
 part1 :: Password -> Either Text Bool

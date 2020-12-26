@@ -78,6 +78,11 @@ library
     Advent2020.Internal.D7
     Advent2020.Internal.D8
     Advent2020.Internal.D9
+    Advent2020.Internal.Debug
+    Advent2020.Internal.Function
+    Advent2020.Internal.List
+    Advent2020.Internal.Parse
+    Advent2020.Internal.Run
 
   build-depends:
     , algebraic-graphs    ==0.5

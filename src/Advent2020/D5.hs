@@ -1,6 +1,6 @@
 module Advent2020.D5 (run, part1, part2) where
 
-import Advent2020.Internal (gather', largest, unsafeNonEmpty, windows)
+import Advent2020.Internal (largest, unsafeNonEmpty, windows)
 import Advent2020.Internal.D5 (Position (..), parse, seatID, specToPosition)
 import Relude
 import Relude.Extra.Map
@@ -8,7 +8,7 @@ import Relude.Extra.Map
 run :: (NonEmpty (Position Int) -> Either Text t) -> Text -> Either Text t
 run runner contents = do
   specs <- parse contents
-  ps <- gather' $ toList $ specToPosition <$> specs
+  ps <- sequence $ toList $ specToPosition <$> specs
   runner $ unsafeNonEmpty ps
 
 part1 :: NonEmpty (Position Int) -> Either Text Int

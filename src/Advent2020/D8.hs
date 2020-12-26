@@ -1,6 +1,6 @@
 module Advent2020.D8 (run, part1, part2) where
 
-import Advent2020.Internal (gather', setAt, simpleRun)
+import Advent2020.Internal (setAt, simpleRun)
 import Advent2020.Internal.D8 (Instruction (..), Machine (..), Operation (..), Program, Status (..), parse, runUntilFixed)
 import Control.Monad.Extra (findM)
 import Relude
@@ -15,7 +15,7 @@ part1 program = do
 
 part2 :: Program -> Either Text Int
 part2 program = do
-  programs <- mconcat <$> gather' (changeProgram' program <$> [1 .. (length program - 1)])
+  programs <- mconcat <$> sequence (changeProgram' program <$> [1 .. (length program - 1)])
   terminates <- maybeToRight "could not find terminating program" =<< findM programTerminates programs
   (_, Machine {..}) <- runUntilFixed terminates
   return accumulator
@@ -24,7 +24,7 @@ part2 program = do
     changeProgram' p n = do
       i@Instruction {..} <- maybeToRight "instruction index out-of-bounds" $ p !!? n
       let i' = changeInstruction i
-      return $ (\v -> setAt n v p) <$> i'
+      sequence $ (\v -> setAt n v p) <$> i'
 
     changeInstruction :: Instruction -> [Instruction]
     changeInstruction i@Instruction {..} = case operation of

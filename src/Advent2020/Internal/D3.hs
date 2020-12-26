@@ -8,7 +8,7 @@ module Advent2020.Internal.D3
   )
 where
 
-import Advent2020.Internal (Parser, gather', parseWithPrettyErrors)
+import Advent2020.Internal (Parser, parseWithPrettyErrors)
 import Relude
 import Text.Megaparsec (eof, hidden, manyTill, someTill)
 import Text.Megaparsec.Char (char, spaceChar)
@@ -62,5 +62,5 @@ slopePath Slope {..} = iterate move (0, 0)
 treesPerSlope :: SledMap -> Slope -> Either Text Int
 treesPerSlope smap@SledMap {..} slope = do
   let path = takeWhile (\(_, y) -> y < length rows) $ slopePath slope
-  squares <- gather' $ squareAt smap <$> path
+  squares <- sequence $ squareAt smap <$> path
   return $ length $ filter (== Tree) squares

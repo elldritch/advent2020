@@ -6,7 +6,7 @@ module Advent2020.Internal.D13
   )
 where
 
-import Advent2020.Internal (min', parseWith, parseWithPrettyErrors, readInt)
+import Advent2020.Internal (parseWith, parseWithPrettyErrors, readInt)
 import Math.NumberTheory.Moduli.Chinese (chinese)
 import Relude
 import qualified Relude.Unsafe as Unsafe
@@ -30,6 +30,9 @@ parse = parseWithPrettyErrors $ do
 earliestBusAfter :: Int -> NonEmpty Int -> (Int, Int)
 earliestBusAfter ready buses = foldr (min' snd) (head firstDepartureAfter) firstDepartureAfter
   where
+    min' :: (Ord b) => (a -> b) -> a -> a -> a
+    min' f a b = if f a < f b then a else b
+
     busDepartures :: NonEmpty (Int, [Int])
     busDepartures = (\busID -> (busID, iterate (+ busID) 0)) <$> buses
 

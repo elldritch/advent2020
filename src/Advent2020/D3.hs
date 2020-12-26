@@ -1,6 +1,6 @@
 module Advent2020.D3 (run, part1, part2) where
 
-import Advent2020.Internal (gather', simpleRun)
+import Advent2020.Internal (simpleRun)
 import Advent2020.Internal.D3 (SledMap, Slope (..), parse, treesPerSlope)
 import Relude
 
@@ -12,7 +12,7 @@ part1 = flip treesPerSlope Slope {right = 3, down = 1}
 
 part2 :: SledMap -> Either Text Int
 part2 smap = do
-  trees <- gather' $ treesPerSlope smap <$> slopes
+  trees <- sequence $ treesPerSlope smap <$> slopes
   return $ product trees
   where
     slopes =

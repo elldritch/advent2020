@@ -1,6 +1,6 @@
 module Advent2020.D10 (run, part1, part2) where
 
-import Advent2020.Internal (gather', largest, runNumbers)
+import Advent2020.Internal (largest, runNumbers)
 import Advent2020.Internal.D10 (joltageDifferences)
 import Algebra.Graph.Acyclic.AdjacencyMap (AdjacencyMap, preSet, toAcyclic, topSort)
 import Algebra.Graph.AdjacencyMap (edges)
@@ -38,7 +38,7 @@ part2 ns = do
     countPaths :: AdjacencyMap Vertex -> Map Vertex Int -> Vertex -> Either Text (Map Vertex Int)
     countPaths _ _ 0 = return $ one (0, 1)
     countPaths graph pathsCounts vertex = do
-      counts <- gather' $ maybeToRight "could not find count for pre-vertex" . (`lookup` pathsCounts) <$> toList from
+      counts <- sequence $ maybeToRight "could not find count for pre-vertex" . (`lookup` pathsCounts) <$> toList from
       return $ insert vertex (sum counts) pathsCounts
       where
         from :: Set Vertex

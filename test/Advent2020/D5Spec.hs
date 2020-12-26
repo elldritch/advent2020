@@ -1,6 +1,5 @@
 module Advent2020.D5Spec (spec) where
 
-import Advent2020.Internal (gather')
 import Advent2020.Internal.D5 (Partition (..), Position (..), SeatSpec, parse, seatID, specToPosition)
 import Advent2020.Spec.Internal (shouldBe')
 import Relude
@@ -40,7 +39,7 @@ spec = do
     parse exampleInput `shouldBe'` exampleSeatSpecs
 
   it "computes seat positions from specs" $ do
-    gather' (toList $ specToPosition <$> exampleSeatSpecs) `shouldBe'` exampleSeatPositions
+    sequence (toList $ specToPosition <$> exampleSeatSpecs) `shouldBe'` exampleSeatPositions
 
   it "computes seat IDs from positions" $ do
     seatID <$> exampleSeatPositions `shouldBe` exampleSeatIDs
