@@ -10,6 +10,7 @@ import qualified Advent2020.D15 as D15
 import qualified Advent2020.D16 as D16
 import qualified Advent2020.D17 as D17
 import qualified Advent2020.D18 as D18
+import qualified Advent2020.D19 as D19
 import qualified Advent2020.D2 as D2
 import qualified Advent2020.D3 as D3
 import qualified Advent2020.D4 as D4
@@ -119,6 +120,10 @@ main = do
       18 -> case part of
         1 -> runEitherPretty $ D18.run D18.part1
         2 -> runEitherPretty $ D18.run D18.part2
+        _ -> catchAll
+      19 -> case part of
+        1 -> runEitherPretty $ D19.run D19.part1
+        -- 2 -> runEitherPretty $ D19.run D19.part2
         _ -> catchAll
       _ -> catchAll
 
