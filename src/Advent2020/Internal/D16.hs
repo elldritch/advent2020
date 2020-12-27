@@ -46,7 +46,7 @@ parse = parseWithPrettyErrors $ do
   where
     ruleP :: Parser (FieldName, [Range])
     ruleP = do
-      name <- toText <$> (letterChar <|> (hspace1 >> return ' ')) `someTill` chunk ": "
+      name <- toText <$> (letterChar <|> (' ' <$ hspace1)) `someTill` chunk ": "
       r1 <- rangeP
       _ <- chunk "or "
       r2 <- rangeP

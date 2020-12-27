@@ -46,15 +46,15 @@ parse = parseWithPrettyErrors $ parseInstruction `someTill` eof
   where
     parseOp :: Parser Operation
     parseOp =
-      (chunk "nop" >> return NoOp)
-        <|> (chunk "acc" >> return Accumulate)
-        <|> (chunk "jmp" >> return Jump)
+      (NoOp <$ chunk "nop")
+        <|> (Accumulate <$ chunk "acc")
+        <|> (Jump <$ chunk "jmp")
 
     parseInstruction :: Parser Instruction
     parseInstruction = do
       operation <- parseOp
       _ <- char ' '
-      sign <- (char '+' >> return 1) <|> (char '-' >> return (-1))
+      sign <- (1 <$ char '+') <|> (-1 <$ char '-')
       value <- parseWith readInt $ digitChar `someTill` newline
       let argument = sign * value
       return Instruction {..}

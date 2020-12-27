@@ -29,10 +29,10 @@ parser = do
   return SledMap {rows}
   where
     openSquareParser :: Parser MapSquare
-    openSquareParser = char '.' >> return Open
+    openSquareParser = Open <$ char '.'
 
     treeSquareParser :: Parser MapSquare
-    treeSquareParser = char '#' >> return Tree
+    treeSquareParser = Tree <$ char '#'
 
     squareParser :: Parser MapSquare
     squareParser = openSquareParser <|> treeSquareParser

@@ -42,7 +42,7 @@ parse = parseWithPrettyErrors $ instructionP `someTill` eof
     setMaskP :: Parser Instruction
     setMaskP = do
       _ <- chunk "mask = "
-      bits <- count 36 $ (char 'X' >> return X) <|> (char '1' >> return One) <|> (char '0' >> return Zero)
+      bits <- count 36 $ (X <$ char 'X') <|> (One <$ char '1') <|> (Zero <$ char '0')
       _ <- newline
       return $ SetMask bits
 

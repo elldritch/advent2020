@@ -48,16 +48,16 @@ parse = parseWithPrettyErrors $ (moveP <|> turnP) `someTill` eof
     moveP :: Parser Instruction
     moveP = do
       action <-
-        (char 'N' >> return (Move North))
-          <|> (char 'S' >> return (Move South))
-          <|> (char 'E' >> return (Move East))
-          <|> (char 'W' >> return (Move West))
-          <|> (char 'F' >> return Forward)
+        (Move North <$ char 'N')
+          <|> (Move South <$ char 'S')
+          <|> (Move East <$ char 'E')
+          <|> (Move West <$ char 'W')
+          <|> (Forward <$ char 'F')
       value <- parseWith readInt $ digitChar `someTill` newline
       return Instruction {..}
     turnP :: Parser Instruction
     turnP = do
-      action <- (char 'L' >> return (Turn DLeft)) <|> (char 'R' >> return (Turn DRight))
+      action <- (Turn DLeft <$ char 'L') <|> (Turn DRight <$ char 'R')
       value <- parseWith readInt (chunk "90" <|> chunk "180" <|> chunk "270")
       _ <- newline
       return Instruction {..}

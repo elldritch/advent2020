@@ -22,7 +22,7 @@ data Schedule = Schedule
 parse :: Text -> Either Text Schedule
 parse = parseWithPrettyErrors $ do
   earliestDeparture <- parseWith readInt $ digitChar `someTill` newline
-  buses <- ((Just <$> parseWith readInt (digitChar `someTill` separator)) <|> (char 'x' >> separator >> return Nothing)) `someTill` eof
+  buses <- ((Just <$> parseWith readInt (digitChar `someTill` separator)) <|> (char 'x' >> separator $> Nothing)) `someTill` eof
   return Schedule {..}
   where
     separator = char ',' <|> newline

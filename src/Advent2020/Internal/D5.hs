@@ -28,8 +28,8 @@ parse = parseWithPrettyErrors $ specParser `someTill` hidden eof
   where
     specParser :: Parser SeatSpec
     specParser = do
-      xs <- count 7 ((char 'F' >> return F) <|> (char 'B' >> return B))
-      ys <- count 3 ((char 'L' >> return L) <|> (char 'R' >> return R))
+      xs <- count 7 $ (F <$ char 'F') <|> (B <$ char 'B')
+      ys <- count 3 $ (L <$ char 'L') <|> (R <$ char 'R')
       _ <- newline
       return $ xs <> ys
 

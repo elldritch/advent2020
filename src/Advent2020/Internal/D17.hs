@@ -36,8 +36,8 @@ parse_ interpretPosition = parseWithPrettyErrors $ do
   let cubes' = interpretPosition . fst <$> filter snd cubes
   return $ Pocket $ fromList cubes'
   where
-    activeP = char '#' >> return True
-    inactiveP = char '.' >> return False
+    activeP = True <$ char '#'
+    inactiveP = False <$ char '.'
     row = (activeP <|> inactiveP) `someTill` newline
 
 parse :: Text -> Either Text (Pocket Position)
