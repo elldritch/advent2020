@@ -11,7 +11,7 @@ where
 import Advent2020.Internal (Parser, parseWithPrettyErrors)
 import Relude
 import Text.Megaparsec (eof, hidden, manyTill, someTill)
-import Text.Megaparsec.Char (char, spaceChar)
+import Text.Megaparsec.Char (char, newline)
 
 data MapSquare = Open | Tree deriving (Show, Eq)
 
@@ -38,7 +38,7 @@ parser = do
     squareParser = openSquareParser <|> treeSquareParser
 
     rowParser :: Parser [MapSquare]
-    rowParser = squareParser `manyTill` spaceChar
+    rowParser = squareParser `manyTill` newline
 
 squareAt :: SledMap -> (Int, Int) -> Either Text MapSquare
 squareAt SledMap {..} (x, y) = do

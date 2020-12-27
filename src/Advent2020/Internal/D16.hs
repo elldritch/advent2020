@@ -20,7 +20,7 @@ import qualified Data.Set as Set
 import Relude
 import Relude.Extra.Map
 import Text.Megaparsec (chunk, eof, someTill, someTill_, try)
-import Text.Megaparsec.Char (char, digitChar, letterChar, newline, spaceChar)
+import Text.Megaparsec.Char (char, digitChar, hspace1, letterChar, newline, spaceChar)
 
 type Range = (Integer, Integer)
 
@@ -46,7 +46,7 @@ parse = parseWithPrettyErrors $ do
   where
     ruleP :: Parser (FieldName, [Range])
     ruleP = do
-      name <- toText <$> (letterChar <|> spaceChar) `someTill` chunk ": "
+      name <- toText <$> (letterChar <|> (hspace1 >> return ' ')) `someTill` chunk ": "
       r1 <- rangeP
       _ <- chunk "or "
       r2 <- rangeP

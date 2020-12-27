@@ -3,7 +3,7 @@ module Advent2020.Internal.D7 (Rule (..), parse) where
 import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
 import Relude
 import Text.Megaparsec (chunk, eof, someTill)
-import Text.Megaparsec.Char (char, digitChar, letterChar, newline, punctuationChar, spaceChar)
+import Text.Megaparsec.Char (char, digitChar, hspace1, letterChar, newline, punctuationChar)
 
 data Rule = Rule
   { color :: Text,
@@ -15,7 +15,7 @@ parse :: Text -> Either Text [Rule]
 parse = parseWithPrettyErrors $ parseRule `someTill` eof
   where
     parseWord :: Parser Text
-    parseWord = toText <$> letterChar `someTill` (spaceChar <|> punctuationChar)
+    parseWord = toText <$> letterChar `someTill` (hspace1 <|> void punctuationChar)
 
     parseTarget :: Parser Text
     parseTarget = do
@@ -26,7 +26,7 @@ parse = parseWithPrettyErrors $ parseRule `someTill` eof
 
     parseContained :: Parser (Map Text Int)
     parseContained = do
-      n <- parseWith readInt $ digitChar `someTill` spaceChar
+      n <- parseWith readInt $ digitChar `someTill` hspace1
       firstWord <- parseWord
       secondWord <- parseWord
       _ <- chunk $ if n == 1 then "bag" else "bags"

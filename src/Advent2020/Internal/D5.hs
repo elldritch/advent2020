@@ -12,7 +12,7 @@ import Advent2020.Internal (Parser, parseWithPrettyErrors)
 import Control.Monad.Combinators.NonEmpty (someTill)
 import Relude
 import Text.Megaparsec (count, eof, hidden)
-import Text.Megaparsec.Char (char, spaceChar)
+import Text.Megaparsec.Char (char, newline)
 
 data Partition
   = F
@@ -30,7 +30,7 @@ parse = parseWithPrettyErrors $ specParser `someTill` hidden eof
     specParser = do
       xs <- count 7 ((char 'F' >> return F) <|> (char 'B' >> return B))
       ys <- count 3 ((char 'L' >> return L) <|> (char 'R' >> return R))
-      _ <- spaceChar
+      _ <- newline
       return $ xs <> ys
 
 data Position t = Position
