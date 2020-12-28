@@ -6,6 +6,7 @@ module Advent2020.Internal.D19
     parse,
     parseRules,
     match,
+    updateRules,
   )
 where
 
@@ -63,7 +64,7 @@ ruleP = do
       return $ subRuleIDs : fromMaybe [] subRules
 
 match :: Rules -> Message -> Bool
-match rules message = [""] == match' message 0
+match rules message = elem "" $ match' message 0
   where
     rule k = Unsafe.fromJust $ lookup k rules
 
@@ -71,6 +72,16 @@ match rules message = [""] == match' message 0
     match' "" _ = empty
     match' m rid = case rule rid of
       Literal c -> if Text.head m == c then return $ Text.tail m else empty
-      SubRules subrules -> do
-        subrule <- subrules
-        foldlM match' m subrule
+      SubRules subrules -> subrules >>= foldlM match' m
+
+updateRules :: Rules -> Rules
+updateRules = updateRules' k1 v1 . updateRules' k2 v2
+  where
+    k1 = 11
+    v1 = [[42, 31], [42, 11, 31]]
+
+    k2 = 8
+    v2 = [[42], [42, 8]]
+
+    updateRules' :: Int -> [[Int]] -> Rules -> Rules
+    updateRules' k v rs = alter (const $ Just $ SubRules v) k rs
