@@ -6,8 +6,9 @@ module Advent2020.Internal.D15
   )
 where
 
-import Advent2020.Internal (parseWith, parseWithPrettyErrors, readInt', unsafeNonEmpty)
+import Advent2020.Internal (parseWith, parseWithPrettyErrors, readInt')
 import Control.Monad.Combinators.NonEmpty (someTill)
+import qualified Data.List.NonEmpty as NonEmpty
 import Relude
 import Relude.Extra.Map
 import qualified Relude.Unsafe as Unsafe
@@ -32,7 +33,7 @@ data Game = Game
 spoken :: NonEmpty Integer -> [Game]
 spoken starting = iterate speak startingGame
   where
-    starting' = unsafeNonEmpty $ zip [1 ..] $ toList starting
+    starting' = NonEmpty.zip (1 :| [2 ..]) starting
     (currentTurn', next') = last starting'
 
     startingGame =

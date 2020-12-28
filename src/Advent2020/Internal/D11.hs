@@ -13,7 +13,6 @@ import Data.List (delete, groupBy)
 import Data.Map (assocs, lookup, mapWithKey)
 import GHC.Show (Show (..))
 import Relude hiding (show)
-import qualified Relude.Unsafe as Unsafe
 import Text.Megaparsec (eof, someTill)
 import Text.Megaparsec.Char (char, newline)
 
@@ -63,7 +62,7 @@ firstVisibleSeat Grid {..} (x, y) = catMaybes $ firstSeatInVector <$> vectors
     outwardCells (dx, dy) = delete (x, y) (iterate (\(x', y') -> (x' + dx, y' + dy)) (x, y))
 
     firstSeatInVector vec =
-      find (/= Floor) $ Unsafe.fromJust <$> takeWhile isJust ((`lookup` grid) <$> outwardCells vec)
+      find (/= Floor) $ catMaybes $ takeWhile isJust ((`lookup` grid) <$> outwardCells vec)
 
 step :: (Grid -> (Int, Int) -> [Position]) -> Int -> Grid -> Grid
 step getNeighbors maxNeighbors g@Grid {..} = Grid $ mapWithKey stepPosition grid

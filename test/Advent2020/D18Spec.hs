@@ -1,9 +1,8 @@
 module Advent2020.D18Spec (spec) where
 
 import Advent2020.Internal.D18 (Expr (..), eval, parse, parse')
-import Advent2020.Spec.Internal (shouldBe')
+import Advent2020.Spec.Internal (fromRight', shouldBe')
 import Relude
-import qualified Relude.Unsafe as Unsafe
 import Test.Hspec (Spec, it, shouldBe)
 
 exampleInput :: Text
@@ -28,9 +27,6 @@ exampleInput2 =
       "((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2"
     ]
 
-unsafeParse :: (Text -> Either Text [Expr]) -> Text -> [Expr]
-unsafeParse parser = Unsafe.fromJust . rightToMaybe . parser
-
 spec :: Spec
 spec = do
   it "parses weird math expressions" $ do
@@ -38,9 +34,9 @@ spec = do
 
   it "evaluates weird math expressions" $ do
     eval <$> exampleExprs `shouldBe` [71, 51]
-    let exprs = unsafeParse parse exampleInput2
+    exprs <- fromRight' $ parse exampleInput2
     eval <$> exprs `shouldBe` [26, 437, 12240, 13632]
 
   it "evaluates advanced weird math expressions" $ do
-    let exprs = unsafeParse parse' $ exampleInput <> exampleInput2
+    exprs <- fromRight' $ parse' $ exampleInput <> exampleInput2
     eval <$> exprs `shouldBe` [231, 51, 46, 1445, 669060, 23340]
