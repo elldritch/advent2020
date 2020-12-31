@@ -1,9 +1,10 @@
 module Advent2020.D11Spec (spec) where
 
-import Advent2020.Internal (fixed)
+import Advent2020.Internal (fixed, gridMap)
 import Advent2020.Internal.D11 (Grid (..), Position (..), adjacent, firstVisibleSeat, parse, step)
 import Advent2020.Spec.Internal (shouldBe')
 import Relude
+import Relude.Extra.Lens
 import Test.Hspec (Spec, it, shouldBe)
 
 exampleInput :: Text
@@ -24,9 +25,9 @@ exampleInput =
 exampleGrid :: Grid Position
 exampleGrid =
   Grid
-    { height = 10,
-      width = 10,
-      gridMap =
+    { _gridHeight = 10,
+      _gridWidth = 10,
+      _gridMap =
         fromList
           [ ((0, 0), Empty),
             ((0, 1), Empty),
@@ -174,7 +175,7 @@ spec = do
     parse exampleInput `shouldBe'` exampleGrid
 
   it "finds the fixed point of layout steps" $ do
-    length (filter (== Occupied) $ toList $ gridMap $ fixed (step adjacent 4) exampleGrid) `shouldBe` 37
+    length (filter (== Occupied) $ toList $ view gridMap $ fixed (step adjacent 4) exampleGrid) `shouldBe` 37
 
   it "computes visible seats" $ do
     visible exampleInput2 (3, 4) `shouldBe'` replicate 8 Occupied
@@ -182,4 +183,4 @@ spec = do
     visible exampleInput4 (3, 3) `shouldBe'` []
 
   it "finds fixed point layouts for people who care about visible seats" $ do
-    length (filter (== Occupied) $ toList $ gridMap $ fixed (step firstVisibleSeat 5) exampleGrid) `shouldBe` 26
+    length (filter (== Occupied) $ toList $ view gridMap $ fixed (step firstVisibleSeat 5) exampleGrid) `shouldBe` 26

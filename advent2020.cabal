@@ -54,6 +54,7 @@ library
     Advent2020.D18
     Advent2020.D19
     Advent2020.D2
+    Advent2020.D20
     Advent2020.D3
     Advent2020.D4
     Advent2020.D5
@@ -73,6 +74,7 @@ library
     Advent2020.Internal.D18
     Advent2020.Internal.D19
     Advent2020.Internal.D2
+    Advent2020.Internal.D20
     Advent2020.Internal.D3
     Advent2020.Internal.D4
     Advent2020.Internal.D5
@@ -92,6 +94,7 @@ library
     , arithmoi            ==0.11.0.1
     , containers          ==0.6.4.1
     , extra               ==1.7.8
+    , lens                ==4.19.2
     , megaparsec          ==9.0.1
     , parser-combinators  ==1.2.1
     , text                ==1.2.4.0
@@ -115,6 +118,7 @@ test-suite tests
     Advent2020.D18Spec
     Advent2020.D19Spec
     Advent2020.D1Spec
+    Advent2020.D20Spec
     Advent2020.D2Spec
     Advent2020.D3Spec
     Advent2020.D4Spec

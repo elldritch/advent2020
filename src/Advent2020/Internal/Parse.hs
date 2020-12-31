@@ -2,11 +2,8 @@ module Advent2020.Internal.Parse
   ( Parser,
     parseWithPrettyErrors,
     parseWith,
-    parseWith',
     parseNumbers,
     readInt,
-    readInt',
-    lexeme,
     symbol,
     integralP,
     wordP,
@@ -31,14 +28,11 @@ parseWithPrettyErrors parser contents = mapLeft (toText . errorBundlePretty) $ r
 -- | Transform and validate a parsed value. If the validation fails, the parser
 -- fails as well.
 parseWith :: (s -> Either Text t) -> Parser s -> Parser t
-parseWith f p = p >>= parseWith' f
-
--- | Transform and validate a parsed value. If the validation fails, the parser
--- fails as well.
-parseWith' :: (s -> Either Text t) -> s -> Parser t
-parseWith' f v = case f v of
-  Right y -> return y
-  Left e -> fail $ toString e
+parseWith f p = do
+  v <- p
+  case f v of
+    Right y -> return y
+    Left e -> fail $ toString e
 
 -- | Parse newline-delimited numbers.
 parseNumbers :: Text -> Either Text (NonEmpty Int)
@@ -47,12 +41,6 @@ parseNumbers = parseWithPrettyErrors $ integralP `NonEmpty.sepEndBy1` newline <*
 -- | 'readEither' specialized to @'Int'@s, with clearer error message.
 readInt :: (ToString s) => s -> Either Text Int
 readInt s = mapLeft (const $ toText $ "could not parse as Int: " ++ show s') $ readEither s'
-  where
-    s' = toString s
-
--- | 'readEither' specialized to @'Integer'@s, with clearer error message.
-readInt' :: (ToString s) => s -> Either Text Integer
-readInt' s = mapLeft (const $ toText $ "could not parse as Integer: " ++ show s') $ readEither s'
   where
     s' = toString s
 

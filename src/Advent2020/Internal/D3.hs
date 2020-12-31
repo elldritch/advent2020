@@ -6,27 +6,34 @@ module Advent2020.Internal.D3
   )
 where
 
-import Advent2020.Internal (Grid (..), parseGrid, parseWithPrettyErrors)
-import Relude
-import Relude.Extra
+import Advent2020.Internal (Grid (..), gridHeight, gridMap, gridWidth, parseGrid, parseWithPrettyErrors)
+import GHC.Show (Show (..))
+import Relude hiding (show)
+import Relude.Extra.Lens
+import Relude.Extra.Map
+import Text.Megaparsec (eof)
 import Text.Megaparsec.Char (char)
 
 data Square
   = Open
   | Tree
-  deriving (Show, Eq)
+  deriving (Eq)
+
+instance Show Square where
+  show Open = "."
+  show Tree = "#"
 
 parse :: Text -> Either Text (Grid Square)
-parse = parseWithPrettyErrors $ parseGrid squareP
+parse = parseWithPrettyErrors $ parseGrid squareP <* eof
   where
     openP = Open <$ char '.'
     treeP = Tree <$ char '#'
     squareP = openP <|> treeP
 
 squareAt :: Grid Square -> (Int, Int) -> Either Text Square
-squareAt Grid {..} (x, y) = maybeToRight ("squareAt: invalid map square: " <> show (x, y)) $ lookup (x', y) gridMap
+squareAt g (x, y) = maybeToRight ("squareAt: invalid map square: " <> toText (show (x, y))) $ lookup (x', y) $ g ^. gridMap
   where
-    x' = x `mod` width
+    x' = x `mod` g ^. gridWidth
 
 data Slope = Slope
   { right :: Int,
@@ -39,7 +46,7 @@ slopePath Slope {..} = iterate move (0, 0)
     move (x, y) = (x + right, y + down)
 
 treesPerSlope :: Grid Square -> Slope -> Either Text Int
-treesPerSlope g@Grid {..} slope = do
-  let path = takeWhile (\(_, y) -> y < height) $ slopePath slope
+treesPerSlope g slope = do
+  let path = takeWhile (\(_, y) -> y < g ^. gridHeight) $ slopePath slope
   squares <- sequence $ squareAt g <$> path
   return $ length $ filter (== Tree) squares

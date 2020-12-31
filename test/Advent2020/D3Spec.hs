@@ -25,9 +25,9 @@ exampleInput =
 exampleSledMap :: Grid Square
 exampleSledMap =
   Grid
-    { height = 11,
-      width = 11,
-      gridMap =
+    { _gridHeight = 11,
+      _gridWidth = 11,
+      _gridMap =
         fromList
           [ ((0, 0), Open),
             ((0, 1), Tree),
