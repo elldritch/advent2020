@@ -11,12 +11,12 @@ module Advent2020.Internal.D8
   )
 where
 
-import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
+import Advent2020.Internal (Parser, integralP, parseWithPrettyErrors, symbol)
 import Data.Set (insert, member)
 import GHC.Show (Show (..))
 import Relude hiding (show)
-import Text.Megaparsec (chunk, eof, someTill)
-import Text.Megaparsec.Char (char, digitChar, newline)
+import Text.Megaparsec (eof, sepEndBy1)
+import Text.Megaparsec.Char (newline)
 
 type Program = [Instruction]
 
@@ -42,24 +42,24 @@ instance Show Instruction where
   show Instruction {..} = show operation ++ " " ++ (if argument >= 0 then "+" else "") ++ show argument
 
 parse :: Text -> Either Text Program
-parse = parseWithPrettyErrors $ parseInstruction `someTill` eof
+parse = parseWithPrettyErrors $ parseInstruction `sepEndBy1` newline <* eof
   where
     parseOp :: Parser Operation
     parseOp =
-      (NoOp <$ chunk "nop")
-        <|> (Accumulate <$ chunk "acc")
-        <|> (Jump <$ chunk "jmp")
+      (NoOp <$ symbol "nop")
+        <|> (Accumulate <$ symbol "acc")
+        <|> (Jump <$ symbol "jmp")
 
     parseInstruction :: Parser Instruction
     parseInstruction = do
       operation <- parseOp
-      _ <- char ' '
-      sign <- (1 <$ char '+') <|> (-1 <$ char '-')
-      value <- parseWith readInt $ digitChar `someTill` newline
-      let argument = sign * value
+      argument <- integralP
       return Instruction {..}
 
-data Status = Running | Terminated deriving (Show, Eq)
+data Status
+  = Running
+  | Terminated
+  deriving (Show, Eq)
 
 data Machine = Machine
   { accumulator :: Int,

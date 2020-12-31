@@ -23,6 +23,6 @@ runNumbers runner contents = do
   xs <- parseNumbers contents
   runner xs
 
--- | Like 'runNumbers', but for '[@Int@]' rather than '@NonEmpty@ @Int@'.
+-- | Like 'runNumbers', but for @['Int']@ rather than @'NonEmpty' 'Int'@.
 runNumbers' :: ([Int] -> Either Text Int) -> Text -> Either Text Int
 runNumbers' r = runNumbers (r . toList)

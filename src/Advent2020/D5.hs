@@ -9,7 +9,7 @@ run :: (NonEmpty (Position Int) -> Either Text t) -> Text -> Either Text t
 run = simpleRun (parse >=> mapM specToPosition)
 
 part1 :: NonEmpty (Position Int) -> Either Text Int
-part1 ps = return $ largest $ seatID <$> ps
+part1 = return . largest . fmap seatID
 
 part2 :: NonEmpty (Position Int) -> Either Text Int
 part2 ps = seatID <$> maybeToRight "could not find open seat" openSeat

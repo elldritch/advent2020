@@ -35,6 +35,6 @@ part2 program = do
     programTerminates :: Program -> Either Text Bool
     programTerminates p = do
       (_, Machine {..}) <- runUntilFixed p
-      case status of
-        Terminated -> return True
-        Running -> return False
+      return $ case status of
+        Terminated -> True
+        _ -> False

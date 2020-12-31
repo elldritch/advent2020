@@ -13,10 +13,10 @@ module Advent2020.Internal.D12
   )
 where
 
-import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
+import Advent2020.Internal (Parser, integralP, parseWithPrettyErrors)
 import Relude
-import Text.Megaparsec (chunk, eof, someTill)
-import Text.Megaparsec.Char (char, digitChar, newline)
+import Text.Megaparsec (eof, sepEndBy1)
+import Text.Megaparsec.Char (char, newline)
 
 data Instruction = Instruction
   { action :: Action,
@@ -43,7 +43,7 @@ data Direction
   deriving (Show, Eq)
 
 parse :: Text -> Either Text [Instruction]
-parse = parseWithPrettyErrors $ (moveP <|> turnP) `someTill` eof
+parse = parseWithPrettyErrors $ (moveP <|> turnP) `sepEndBy1` newline <* eof
   where
     moveP :: Parser Instruction
     moveP = do
@@ -53,13 +53,12 @@ parse = parseWithPrettyErrors $ (moveP <|> turnP) `someTill` eof
           <|> (Move East <$ char 'E')
           <|> (Move West <$ char 'W')
           <|> (Forward <$ char 'F')
-      value <- parseWith readInt $ digitChar `someTill` newline
+      value <- integralP
       return Instruction {..}
     turnP :: Parser Instruction
     turnP = do
       action <- (Turn DLeft <$ char 'L') <|> (Turn DRight <$ char 'R')
-      value <- parseWith readInt (chunk "90" <|> chunk "180" <|> chunk "270")
-      _ <- newline
+      value <- integralP
       return Instruction {..}
 
 type Position = (Int, Int)

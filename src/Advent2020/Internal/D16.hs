@@ -11,7 +11,7 @@ module Advent2020.Internal.D16
   )
 where
 
-import Advent2020.Internal (Parser, fixed, parseWith, parseWithPrettyErrors, readInt', unsafeNonEmpty)
+import Advent2020.Internal (Parser, fixed, integralP, parseWithPrettyErrors, symbol, unsafeNonEmpty, wordP)
 import qualified Control.Monad.Combinators.NonEmpty as NonEmpty
 import Data.Map (foldrWithKey, unionWith)
 import qualified Data.Map as Map
@@ -19,8 +19,8 @@ import Data.Set (intersection, union, (\\))
 import qualified Data.Set as Set
 import Relude
 import Relude.Extra.Map
-import Text.Megaparsec (chunk, eof, someTill, someTill_, try)
-import Text.Megaparsec.Char (char, digitChar, hspace1, letterChar, newline, spaceChar)
+import Text.Megaparsec (eof, sepBy1, sepEndBy1)
+import Text.Megaparsec.Char (newline)
 
 type Range = (Integer, Integer)
 
@@ -36,35 +36,34 @@ newtype FieldID = FieldID {unFieldID :: Int} deriving (Eq, Ord, Show)
 
 parse :: Text -> Either Text (Rules, Ticket, NonEmpty Ticket)
 parse = parseWithPrettyErrors $ do
-  rules <- ruleP `someTill` newline
-  _ <- chunk "your ticket:\n"
-  mine <- ticketP
+  rules <- ruleP `sepEndBy1` newline
   _ <- newline
-  _ <- chunk "nearby tickets:\n"
-  others <- ticketP `NonEmpty.someTill` eof
+  _ <- symbol "your ticket:\n"
+  mine <- ticketP <* newline
+  _ <- newline
+  _ <- symbol "nearby tickets:\n"
+  others <- ticketP `NonEmpty.sepEndBy1` newline
+  _ <- eof
   return (fromList rules, mine, others)
   where
     ruleP :: Parser (FieldName, [Range])
     ruleP = do
-      name <- toText <$> (letterChar <|> (' ' <$ hspace1)) `someTill` chunk ": "
+      name <- unwords <$> some wordP
+      _ <- symbol ":"
       r1 <- rangeP
-      _ <- chunk "or "
+      _ <- symbol "or"
       r2 <- rangeP
       return (FieldName name, [r1, r2])
 
     rangeP :: Parser Range
     rangeP = do
-      low <- parseWith readInt' $ digitChar `someTill` char '-'
-      high <- parseWith readInt' $ digitChar `someTill` spaceChar
+      low <- integralP
+      _ <- symbol "-"
+      high <- integralP
       return (low, high)
 
     ticketP :: Parser Ticket
-    ticketP = do
-      (fields, lastField) <- fieldP `someTill_` try lastFieldP
-      return $ fromList $ zip (FieldID <$> [0 ..]) $ fields ++ [lastField]
-      where
-        fieldP = parseWith readInt' $ digitChar `someTill` char ','
-        lastFieldP = parseWith readInt' $ digitChar `someTill` newline
+    ticketP = fromList . zip (FieldID <$> [0 ..]) <$> (integralP `sepBy1` symbol ",")
 
 -- | Returns true if the integer is within one of the ranges of the rule. Use infix as 'n `withinRange` rule'.
 withinRule :: Integer -> Rule -> Bool

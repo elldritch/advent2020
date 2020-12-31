@@ -28,6 +28,13 @@ cabal install hspec-discover
 cabal test
 ```
 
+Running all questions given a folder of inputs:
+
+```
+ls -1 inputs | sort -n | xargs -I{} -t cabal run advent2020 -- --day {} --part 1 --input_file ./inputs/{}
+ls -1 inputs | sort -n | xargs -I{} -t cabal run advent2020 -- --day {} --part 2 --input_file ./inputs/{}
+```
+
 ### GitHub Codespaces
 
 You can run this project on GitHub Codespaces. After creating a Codespace using the project's devcontainer configuration, you'll need to do some manual steps to get the build to run:

@@ -7,12 +7,12 @@ module Advent2020.Internal.D4
   )
 where
 
-import Advent2020.Internal (Parser, parseWith, parseWith', parseWithPrettyErrors, readInt)
+import Advent2020.Internal (Parser, integralP, parseWith, parseWithPrettyErrors, readInt, wordP)
 import Data.Either.Extra (mapLeft)
 import Data.List.Extra (replace, trim)
 import Relude
 import Relude.Extra.Map
-import Text.Megaparsec (ParseErrorBundle (..), count, eof, hidden, parseErrorTextPretty, runParser, someTill, someTill_)
+import Text.Megaparsec (ParseErrorBundle (..), count, eof, parseErrorTextPretty, runParser, sepEndBy1)
 import Text.Megaparsec.Char (alphaNumChar, char, digitChar, hexDigitChar, letterChar, newline, spaceChar)
 
 data Passport = Passport
@@ -45,14 +45,11 @@ data Length
   deriving (Show, Eq)
 
 parse :: Text -> Either Text [Passport]
-parse = parseWithPrettyErrors parser
-
-parser :: Parser [Passport]
-parser = passportParser `someTill` hidden eof
+parse = parseWithPrettyErrors $ passportParser `sepEndBy1` newline <* eof
 
 passportParser :: Parser Passport
 passportParser = do
-  fields <- fieldParser `someTill` (void newline <|> eof)
+  fields <- fieldParser `sepEndBy1` spaceChar
   let fieldMap :: Map Text Text = fromList fields
   return $ makePassport fieldMap
 
@@ -60,7 +57,7 @@ fieldParser :: Parser (Text, Text)
 fieldParser = do
   key <- toText <$> count 3 letterChar
   void $ char ':'
-  field <- toText <$> (char '#' <|> alphaNumChar) `someTill` spaceChar
+  field <- toText <$> some (char '#' <|> alphaNumChar)
   return (key, field)
 
 makePassport :: Map Text Text -> Passport
@@ -110,22 +107,13 @@ validateHeight = parseWithSimpleError "height" heightParser
   where
     heightParser :: Parser Length
     heightParser = do
-      (digits, firstLetter) <- digitChar `someTill_` letterChar
-      h <- parseWith' readInt digits
-      lastLetter <- letterChar
+      value <- integralP
+      units <- wordP
       _ <- eof
-      let units = firstLetter : [lastLetter]
-      result <- case units of
-        "in" -> return $ Inches h
-        "cm" -> return $ Centimeters h
+      case units of
+        "in" -> Inches <$> validateNumber (59, 75) "inches" value
+        "cm" -> Centimeters <$> validateNumber (150, 193) "cm" value
         _ -> fail $ "invalid units in height: " <> show units
-      case result of
-        Centimeters cm -> do
-          n <- validateNumber (150, 193) "cm" cm
-          return $ Centimeters n
-        Inches i -> do
-          n <- validateNumber (59, 75) "inches" i
-          return $ Inches n
 
 validateHairColor :: Text -> Either Text HexCode
 validateHairColor = parseWithSimpleError "hair color" hairColorParser
@@ -150,7 +138,4 @@ validateEyeColor eyeColor = case eyeColor of
 validatePassportID :: Text -> Either Text Int
 validatePassportID = parseWithSimpleError "passport ID" passportIDParser
   where
-    passportIDParser = do
-      pid <- parseWith readInt $ count 9 digitChar
-      _ <- eof
-      return pid
+    passportIDParser = parseWith readInt $ count 9 digitChar <* eof

@@ -82,6 +82,7 @@ library
     Advent2020.Internal.D9
     Advent2020.Internal.Debug
     Advent2020.Internal.Function
+    Advent2020.Internal.Grid
     Advent2020.Internal.List
     Advent2020.Internal.Parse
     Advent2020.Internal.Run

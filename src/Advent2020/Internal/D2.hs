@@ -6,7 +6,7 @@ where
 
 import Advent2020.Internal (Parser, integralP, parseWithPrettyErrors, symbol, wordP)
 import Relude
-import Text.Megaparsec (eof, hidden, someTill, (<?>))
+import Text.Megaparsec (eof, sepEndBy1, (<?>))
 import Text.Megaparsec.Char (letterChar, newline)
 
 data Password = Password
@@ -18,7 +18,7 @@ data Password = Password
   deriving (Show, Eq)
 
 parse :: Text -> Either Text [Password]
-parse = parseWithPrettyErrors $ parser `someTill` hidden eof
+parse = parseWithPrettyErrors $ parser `sepEndBy1` newline <* eof
 
 parser :: Parser Password
 parser = do
@@ -28,5 +28,4 @@ parser = do
   letter <- letterChar <?> "letter"
   _ <- symbol ":"
   password <- wordP <?> "password"
-  _ <- newline
   return Password {..}

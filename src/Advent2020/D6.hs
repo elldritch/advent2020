@@ -6,9 +6,7 @@ import Relude
 import Relude.Extra.Map
 
 run :: (Group -> Set Char) -> Text -> Either Text Int
-run runner contents = do
-  groups <- parse contents
-  return $ sum $ size . runner <$> groups
+run runner contents = parse contents <&> sum . fmap (size . runner)
 
 part1 :: Group -> Set Char
 part1 = foldr union mempty

@@ -15,7 +15,7 @@ import qualified Data.Text as Text
 import Relude
 import Relude.Extra.Map
 import qualified Relude.Unsafe as Unsafe
-import Text.Megaparsec (between, eof, someTill)
+import Text.Megaparsec (between, eof, sepBy1, someTill)
 import Text.Megaparsec.Char (char, letterChar, newline)
 
 type Rules = Map RuleID Rule
@@ -34,14 +34,8 @@ type Message = Text
 parse :: Text -> Either Text (Rules, [Message])
 parse = parseWithPrettyErrors $ do
   rules <- fromList <$> ruleP `someTill` newline
-  messages <- messageP `someTill` eof
+  messages <- (wordP <* newline) `someTill` eof
   return (rules, messages)
-  where
-    messageP :: Parser Message
-    messageP = do
-      message <- wordP
-      _ <- newline
-      return message
 
 parseRules :: Text -> Either Text Rules
 parseRules = parseWithPrettyErrors $ fromList <$> ruleP `someTill` eof
@@ -58,10 +52,7 @@ ruleP = do
     literalP = Literal <$> between (char '"') (char '"') letterChar
 
     subrulesP :: Parser [SubRule]
-    subrulesP = do
-      subRuleIDs <- some integralP
-      subRules <- optional $ symbol "|" >> subrulesP
-      return $ subRuleIDs : fromMaybe [] subRules
+    subrulesP = some integralP `sepBy1` symbol "|"
 
 match :: Rules -> Message -> Bool
 match rules message = elem "" $ match' message 0

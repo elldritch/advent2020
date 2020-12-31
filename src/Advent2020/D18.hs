@@ -4,9 +4,7 @@ import Advent2020.Internal.D18 (Expr, eval, parse, parse')
 import Relude
 
 run :: (Text -> Either Text [Expr]) -> Text -> Either Text Integer
-run parser contents = do
-  exprs <- parser contents
-  return $ sum $ fmap eval exprs
+run parser contents = parser contents <&> sum . fmap eval
 
 part1 :: (Text -> Either Text [Expr])
 part1 = parse

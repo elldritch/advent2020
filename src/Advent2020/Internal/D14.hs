@@ -12,12 +12,12 @@ module Advent2020.Internal.D14
   )
 where
 
-import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt')
+import Advent2020.Internal (Parser, integralP, parseWithPrettyErrors, symbol)
 import Data.Bits (clearBit, setBit, shift, (.&.), (.|.))
 import Relude
 import Relude.Extra.Map
-import Text.Megaparsec (chunk, count, eof, someTill)
-import Text.Megaparsec.Char (char, digitChar, newline)
+import Text.Megaparsec (count, eof, sepEndBy1)
+import Text.Megaparsec.Char (char, newline)
 
 -- Programs are sequences of instructions.
 type Program = [Instruction]
@@ -34,24 +34,26 @@ data Instruction
   deriving (Show, Eq)
 
 parse :: Text -> Either Text Program
-parse = parseWithPrettyErrors $ instructionP `someTill` eof
+parse = parseWithPrettyErrors $ instructionP `sepEndBy1` newline <* eof
   where
     instructionP :: Parser Instruction
     instructionP = setMaskP <|> setMemoryP
 
     setMaskP :: Parser Instruction
     setMaskP = do
-      _ <- chunk "mask = "
+      _ <- symbol "mask"
+      _ <- symbol "="
       bits <- count 36 $ (X <$ char 'X') <|> (One <$ char '1') <|> (Zero <$ char '0')
-      _ <- newline
       return $ SetMask bits
 
     setMemoryP :: Parser Instruction
     setMemoryP = do
-      _ <- chunk "mem["
-      address <- parseWith readInt' (digitChar `someTill` char ']')
-      _ <- chunk " = "
-      value <- parseWith readInt' (digitChar `someTill` newline)
+      _ <- symbol "mem"
+      _ <- symbol "["
+      address <- integralP
+      _ <- symbol "]"
+      _ <- symbol "="
+      value <- integralP
       return SetMemory {..}
 
 -- Machines are executions of programs.

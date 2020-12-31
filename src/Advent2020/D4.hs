@@ -7,9 +7,7 @@ import Advent2020.Internal.D4 (Passport (..), parse)
 import Relude
 
 run :: (Passport -> Bool) -> Text -> Either Text Int
-run runner contents = do
-  ps <- label "parsing passports" $ parse contents
-  return $ length $ filter runner ps
+run runner contents = label "parsing passports" (parse contents) <&> length . filter runner
 
 checkPassport :: (forall a. Maybe (Either Text a) -> Bool) -> Passport -> Bool
 checkPassport f Passport {..} =

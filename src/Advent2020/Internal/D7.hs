@@ -1,9 +1,9 @@
 module Advent2020.Internal.D7 (Rule (..), parse) where
 
-import Advent2020.Internal (Parser, parseWith, parseWithPrettyErrors, readInt)
+import Advent2020.Internal (Parser, integralP, parseWithPrettyErrors, symbol, wordP)
 import Relude
-import Text.Megaparsec (chunk, eof, someTill)
-import Text.Megaparsec.Char (char, digitChar, hspace1, letterChar, newline, punctuationChar)
+import Text.Megaparsec (eof, sepBy1, sepEndBy1)
+import Text.Megaparsec.Char (char, newline)
 
 data Rule = Rule
   { color :: Text,
@@ -12,31 +12,27 @@ data Rule = Rule
   deriving (Show, Eq)
 
 parse :: Text -> Either Text [Rule]
-parse = parseWithPrettyErrors $ parseRule `someTill` eof
+parse = parseWithPrettyErrors $ parseRule `sepEndBy1` newline <* eof
   where
-    parseWord :: Parser Text
-    parseWord = toText <$> letterChar `someTill` (hspace1 <|> void punctuationChar)
-
     parseTarget :: Parser Text
     parseTarget = do
-      firstWord <- parseWord
-      secondWord <- parseWord
-      _ <- chunk "bags"
+      firstWord <- wordP
+      secondWord <- wordP
+      _ <- symbol "bags"
       return $ firstWord <> " " <> secondWord
 
     parseContained :: Parser (Map Text Int)
     parseContained = do
-      n <- parseWith readInt $ digitChar `someTill` hspace1
-      firstWord <- parseWord
-      secondWord <- parseWord
-      _ <- chunk $ if n == 1 then "bag" else "bags"
-      _ <- optional $ chunk ", "
+      n <- integralP
+      firstWord <- wordP
+      secondWord <- wordP
+      _ <- symbol $ if n == 1 then "bag" else "bags"
       return $ one (firstWord <> " " <> secondWord, n)
 
     parseRule :: Parser Rule
     parseRule = do
       color <- parseTarget
-      _ <- chunk " contain "
-      contains <- (chunk "no other bags." >> mempty) <|> (mconcat <$> (parseContained `someTill` char '.'))
-      _ <- newline
+      _ <- symbol "contain"
+      contains <- (symbol "no other bags" >> mempty) <|> (mconcat <$> (parseContained `sepBy1` symbol ","))
+      _ <- char '.'
       return Rule {..}

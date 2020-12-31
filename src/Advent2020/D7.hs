@@ -21,9 +21,7 @@ part1 rules = do
 type RuleMap = Map Text (Map Text Int)
 
 part2 :: [Rule] -> Either Text Int
-part2 rules = do
-  count <- bagContains m "shiny gold"
-  return $ count - 1
+part2 rules = subtract 1 <$> bagContains m "shiny gold" -- (-1) because "shiny gold" is also a contained bag
   where
     m = fromList $ (\Rule {..} -> (color, contains)) <$> rules
 

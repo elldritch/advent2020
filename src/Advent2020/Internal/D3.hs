@@ -1,53 +1,32 @@
 module Advent2020.Internal.D3
-  ( MapSquare (..),
-    SledMap (..),
+  ( Square (..),
     parse,
-    squareAt,
     Slope (..),
     treesPerSlope,
   )
 where
 
-import Advent2020.Internal (Parser, parseWithPrettyErrors)
+import Advent2020.Internal (Grid (..), parseGrid, parseWithPrettyErrors)
 import Relude
-import Text.Megaparsec (eof, hidden, manyTill, someTill)
-import Text.Megaparsec.Char (char, newline)
+import Relude.Extra
+import Text.Megaparsec.Char (char)
 
-data MapSquare = Open | Tree deriving (Show, Eq)
-
-newtype SledMap = SledMap
-  { rows :: [[MapSquare]]
-  }
+data Square
+  = Open
+  | Tree
   deriving (Show, Eq)
 
-parse :: Text -> Either Text SledMap
-parse = parseWithPrettyErrors parser
-
-parser :: Parser SledMap
-parser = do
-  rows <- rowParser `someTill` hidden eof
-  return SledMap {rows}
+parse :: Text -> Either Text (Grid Square)
+parse = parseWithPrettyErrors $ parseGrid squareP
   where
-    openSquareParser :: Parser MapSquare
-    openSquareParser = Open <$ char '.'
+    openP = Open <$ char '.'
+    treeP = Tree <$ char '#'
+    squareP = openP <|> treeP
 
-    treeSquareParser :: Parser MapSquare
-    treeSquareParser = Tree <$ char '#'
-
-    squareParser :: Parser MapSquare
-    squareParser = openSquareParser <|> treeSquareParser
-
-    rowParser :: Parser [MapSquare]
-    rowParser = squareParser `manyTill` newline
-
-squareAt :: SledMap -> (Int, Int) -> Either Text MapSquare
-squareAt SledMap {..} (x, y) = do
-  row <- maybeToRight (err "y") $ rows !!? y
-  let l = length row
-  let x' = x `mod` l
-  maybeToRight (err "x") $ row !!? x'
+squareAt :: Grid Square -> (Int, Int) -> Either Text Square
+squareAt Grid {..} (x, y) = maybeToRight ("squareAt: invalid map square: " <> show (x, y)) $ lookup (x', y) gridMap
   where
-    err axis = "invalid map square (" <> axis <> " out-of-bounds): " <> show (x, y)
+    x' = x `mod` width
 
 data Slope = Slope
   { right :: Int,
@@ -59,8 +38,8 @@ slopePath Slope {..} = iterate move (0, 0)
   where
     move (x, y) = (x + right, y + down)
 
-treesPerSlope :: SledMap -> Slope -> Either Text Int
-treesPerSlope smap@SledMap {..} slope = do
-  let path = takeWhile (\(_, y) -> y < length rows) $ slopePath slope
-  squares <- sequence $ squareAt smap <$> path
+treesPerSlope :: Grid Square -> Slope -> Either Text Int
+treesPerSlope g@Grid {..} slope = do
+  let path = takeWhile (\(_, y) -> y < height) $ slopePath slope
+  squares <- sequence $ squareAt g <$> path
   return $ length $ filter (== Tree) squares

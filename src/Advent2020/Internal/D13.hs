@@ -6,12 +6,12 @@ module Advent2020.Internal.D13
   )
 where
 
-import Advent2020.Internal (parseWith, parseWithPrettyErrors, readInt)
+import Advent2020.Internal (integralP, parseWithPrettyErrors)
 import Math.NumberTheory.Moduli.Chinese (chinese)
 import Relude
 import qualified Relude.Unsafe as Unsafe
-import Text.Megaparsec (eof, someTill)
-import Text.Megaparsec.Char (char, digitChar, newline)
+import Text.Megaparsec (eof, sepBy1)
+import Text.Megaparsec.Char (char, newline)
 
 data Schedule = Schedule
   { earliestDeparture :: Int,
@@ -21,11 +21,14 @@ data Schedule = Schedule
 
 parse :: Text -> Either Text Schedule
 parse = parseWithPrettyErrors $ do
-  earliestDeparture <- parseWith readInt $ digitChar `someTill` newline
-  buses <- ((Just <$> parseWith readInt (digitChar `someTill` separator)) <|> (char 'x' >> separator $> Nothing)) `someTill` eof
+  earliestDeparture <- integralP
+  _ <- newline
+  buses <- (busP <|> noBusP) `sepBy1` char ','
+  _ <- newline >> eof
   return Schedule {..}
   where
-    separator = char ',' <|> newline
+    busP = Just <$> integralP
+    noBusP = Nothing <$ char 'x'
 
 earliestBusAfter :: Int -> NonEmpty Int -> (Int, Int)
 earliestBusAfter ready buses = foldr (min' snd) (head firstDepartureAfter) firstDepartureAfter

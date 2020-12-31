@@ -4,9 +4,7 @@ import Advent2020.Internal.D17 (Hyperposition, Pocket (..), Position, numCubes, 
 import Relude
 
 run :: (Ord t) => (Text -> Either Text (Pocket t), Int -> Pocket t -> Pocket t) -> Text -> Either Text Int
-run (parser, stepper) contents = do
-  pocket <- parser contents
-  return $ numCubes $ stepper 6 pocket
+run (parser, stepper) contents = parser contents <&> numCubes . stepper 6
 
 part1 :: (Text -> Either Text (Pocket Position), Int -> Pocket Position -> Pocket Position)
 part1 = (parse, stepN)

@@ -12,12 +12,12 @@ module Advent2020.Internal.D17
   )
 where
 
-import Advent2020.Internal (parseWithPrettyErrors, unsafeNonEmpty)
+import Advent2020.Internal (Grid (..), parseGrid, parseWithPrettyErrors, unsafeNonEmpty)
 import qualified Data.List as List
+import qualified Data.Map as Map
 import Relude
 import Relude.Extra.Map
-import Text.Megaparsec (eof, someTill)
-import Text.Megaparsec.Char (char, newline)
+import Text.Megaparsec.Char (char)
 
 type Position = (Int, Int, Int)
 
@@ -31,14 +31,13 @@ numCubes (Pocket actives) = size actives
 
 parse_ :: (Ord t) => ((Int, Int) -> t) -> Text -> Either Text (Pocket t)
 parse_ interpretPosition = parseWithPrettyErrors $ do
-  rows <- row `someTill` eof
-  let cubes = concatMap (\(y, xs) -> fmap (\(x, p) -> ((x, y), p)) xs) $ zip [0 ..] $ zip [0 ..] <$> rows
-  let cubes' = interpretPosition . fst <$> filter snd cubes
+  Grid {..} <- parseGrid cubeP
+  let cubes' = interpretPosition . fst <$> filter snd (Map.toList gridMap)
   return $ Pocket $ fromList cubes'
   where
     activeP = True <$ char '#'
     inactiveP = False <$ char '.'
-    row = (activeP <|> inactiveP) `someTill` newline
+    cubeP = activeP <|> inactiveP
 
 parse :: Text -> Either Text (Pocket Position)
 parse = parse_ $ \(x, y) -> (x, y, 0)

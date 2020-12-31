@@ -6,9 +6,7 @@ import qualified Data.Text as Text
 import Relude
 
 run :: (Password -> Bool) -> Text -> Either Text Int
-run isValid contents = do
-  passwords <- label "parsing passwords" $ parse contents
-  return $ sum $ fromEnum . isValid <$> passwords
+run isValid contents = label "parsing passwords" (parse contents) <&> (sum . fmap (fromEnum . isValid))
 
 part1 :: Password -> Bool
 part1 Password {..} = count >= a && count <= b

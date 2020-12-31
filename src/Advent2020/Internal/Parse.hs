@@ -16,8 +16,8 @@ where
 import qualified Control.Monad.Combinators.NonEmpty as NonEmpty
 import Data.Either.Extra (mapLeft)
 import Relude
-import Text.Megaparsec (MonadParsec (eof, hidden), Parsec, errorBundlePretty, runParser, someTill, (<?>))
-import Text.Megaparsec.Char (digitChar, hspace, letterChar, newline)
+import Text.Megaparsec (Parsec, eof, errorBundlePretty, runParser)
+import Text.Megaparsec.Char (hspace, letterChar, newline)
 import qualified Text.Megaparsec.Char.Lexer as L
 
 -- | Parsers on 'Text' without custom error components. See the documentation
@@ -42,30 +42,32 @@ parseWith' f v = case f v of
 
 -- | Parse newline-delimited numbers.
 parseNumbers :: Text -> Either Text (NonEmpty Int)
-parseNumbers = parseWithPrettyErrors $ parseWith readInt numberLineParser `NonEmpty.someTill` hidden eof
-  where
-    numberLineParser = digitChar `someTill` newline <?> "number"
+parseNumbers = parseWithPrettyErrors $ integralP `NonEmpty.sepEndBy1` newline <* eof
 
--- | 'readEither' specialized to '@Int@'s, with clearer error message.
+-- | 'readEither' specialized to @'Int'@s, with clearer error message.
 readInt :: (ToString s) => s -> Either Text Int
 readInt s = mapLeft (const $ toText $ "could not parse as Int: " ++ show s') $ readEither s'
   where
     s' = toString s
 
--- | 'readEither' specialized to '@Integer@'s, with clearer error message.
+-- | 'readEither' specialized to @'Integer'@s, with clearer error message.
 readInt' :: (ToString s) => s -> Either Text Integer
 readInt' s = mapLeft (const $ toText $ "could not parse as Integer: " ++ show s') $ readEither s'
   where
     s' = toString s
 
+-- | Runs a parse, consuming all horizontal whitespace afterwards.
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme hspace
 
+-- | Parse a literal string of text, consuming all horizontal whitespace afterwards.
 symbol :: Text -> Parser Text
 symbol = L.symbol hspace
 
+-- | Parse a signed integer, consuming all horizontal whitespace afterwards.
 integralP :: (Integral i) => Parser i
 integralP = L.signed hspace $ lexeme L.decimal
 
+-- | Parse a contiguous run of one or more letters, consuming all horizontal whitespace afterwards.
 wordP :: Parser Text
 wordP = toText <$> lexeme (some letterChar)
