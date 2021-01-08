@@ -9,7 +9,7 @@ module Advent2020.Internal.D20
   )
 where
 
-import Advent2020.Internal (Grid (..), gridMap, integralP, parseGrid, parseWithPrettyErrors, showGrid, symbol)
+import Advent2020.Internal (tracePrefix, Grid (..), gridMap, integralP, parseGrid, parseWithPrettyErrors, showGrid, symbol)
 import Control.Lens (makeLenses, over, view, (^.))
 import Data.Map (foldrWithKey, mapKeys, mapWithKey)
 import qualified Data.Map as Map
@@ -126,7 +126,7 @@ corners tiles = cornerTiles
     tileEdges = edges <$> tileMap
 
     tileEdgeMatches :: Map TileID (Sides (Set TileID))
-    tileEdgeMatches = mapWithKey tileToMatches tileEdges
+    tileEdgeMatches = tracePrefix "tileEdgeMatches" $ mapWithKey tileToMatches tileEdges
       where
         tileToMatches :: TileID -> Sides Edge -> Sides (Set TileID)
         tileToMatches tID = fmap (`edgeMatches` delete tID tileEdges)
@@ -145,3 +145,10 @@ corners tiles = cornerTiles
 
     cornerTiles :: [Tile]
     cornerTiles = Unsafe.fromJust . (`lookup` tileMap) <$> keys (Map.filter ((== 2) . sum . fmap (fromEnum . null)) tileEdgeMatches)
+
+-- 1. Start with a corner. WLOG, assume it's the correct orientation.
+-- 2. For each edge, add the matching tile, making sure it's in the right
+-- orientation.
+
+reconstruct :: [Tile] -> Grid Tile
+reconstruct = undefined
