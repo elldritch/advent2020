@@ -1,5 +1,6 @@
 module Advent2020.Internal.D20
   ( Tile (..),
+    TileID,
     tileID,
     tileGrid,
     showTile,
@@ -9,9 +10,9 @@ module Advent2020.Internal.D20
   )
 where
 
-import Advent2020.Internal (tracePrefix, Grid (..), gridMap, integralP, parseGrid, parseWithPrettyErrors, showGrid, symbol)
-import Control.Lens (makeLenses, over, view, (^.))
-import Data.Map (foldrWithKey, mapKeys, mapWithKey)
+import Advent2020.Internal (Grid (..), Sides (..), edges, integralP, parseGrid, parseWithPrettyErrors, showGrid, symbol, unsafeNonEmpty)
+import Control.Lens (makeLenses, view)
+import Data.Map (foldrWithKey, mapWithKey)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import GHC.Show (Show (..))
@@ -42,8 +43,8 @@ data Tile = Tile
 
 $(makeLenses ''Tile)
 
-parse :: Text -> Either Text [Tile]
-parse = parseWithPrettyErrors $ tileP `sepEndBy1` newline <* eof
+parse :: Text -> Either Text (Map TileID Tile)
+parse = parseWithPrettyErrors $ fromList <$> ((\t@Tile {..} -> (_tileID, t)) <<$>> tilesP)
   where
     tileIDP = symbol "Tile" >> integralP <* symbol ":"
     blackP = Black <$ char '.'
@@ -54,101 +55,51 @@ parse = parseWithPrettyErrors $ tileP `sepEndBy1` newline <* eof
       _ <- newline
       _tileGrid <- parseGrid pixelP
       return Tile {..}
+    tilesP = tileP `sepEndBy1` newline <* eof
 
 showTile :: Tile -> Text
 showTile = showGrid . view tileGrid
-
-data Sides t = Sides
-  { top :: t,
-    right :: t,
-    bottom :: t,
-    left :: t
-  }
-  deriving (Show)
-
-instance Functor Sides where
-  fmap f Sides {..} =
-    Sides
-      { top = f top,
-        right = f right,
-        bottom = f bottom,
-        left = f left
-      }
-
-instance Foldable Sides where
-  foldr f z Sides {..} = foldr f z [top, right, bottom, left]
-
--- Puzzle inputs are always 10-by-10 square tiles.
-squareSize :: Int
-squareSize = 10
-
--- Rotate a square tile clockwise.
-rotate :: Tile -> Tile
-rotate = over (tileGrid . gridMap) $ mapKeys (\(x, y) -> (- y + (squareSize - 1), x))
-
--- Reflect a square tile across the X axis.
-reflect :: Tile -> Tile
-reflect = over (tileGrid . gridMap) $ mapKeys (first (squareSize - 1 -))
-
--- The elements of the dihedral group of order 8 (i.e. the rotational and
--- reflective symmetries of a square).
-dihedral :: Tile -> [Tile]
-dihedral t = mconcat [[rotation, reflect rotation] | rotation <- rotations]
-  where
-    rotations = take 4 $ iterate rotate t
-
--- The 4 edges of a square tile.
-edges :: Tile -> Sides Edge
-edges t = lookup' <<$>> Sides {..}
-  where
-    lookup' :: (Int, Int) -> Pixel
-    lookup' = Unsafe.fromJust . (`lookup` view (tileGrid . gridMap) t)
-    is = [0 .. squareSize -1]
-    top = [(i, 0) | i <- is]
-    right = [(squareSize - 1, i) | i <- is]
-    bottom = [(i, squareSize - 1) | i <- reverse is]
-    left = [(0, i) | i <- reverse is]
 
 -- Edges align if they are equal, or reverse-equal (because you just need to
 -- flip the tile).
 align :: Edge -> Edge -> Bool
 align a b = a == b || a == reverse b
 
+-- For each tile, for each side of the tile, get the set of other tiles with
+-- matching borders.
+matchingBorders :: Map TileID Tile -> Map TileID (Sides (Set TileID))
+matchingBorders tiles = mapWithKey tileToMatches tileEdges
+  where
+    tileEdges :: Map TileID (Sides Edge)
+    tileEdges = edges . view tileGrid <$> tiles
+
+    tileToMatches :: TileID -> Sides Edge -> Sides (Set TileID)
+    tileToMatches tID = fmap (`edgeMatches` delete tID tileEdges)
+
+    -- Collect a set of tiles that this edge could possibly align with.
+    edgeMatches :: Edge -> Map TileID (Sides Edge) -> Set TileID
+    edgeMatches edge otherTiles =
+      foldrWithKey
+        ( \otherTileID otherTileEdges acc ->
+            if or $ align edge <$> otherTileEdges
+              then Set.insert otherTileID acc
+              else acc
+        )
+        mempty
+        otherTiles
+
 -- Find the corner tiles (i.e. tiles which have 2 edges that do not match any
 -- other tiles).
-corners :: [Tile] -> [Tile]
-corners tiles = cornerTiles
-  where
-    tileMap :: Map TileID Tile
-    tileMap = fromList $ (\t -> (t ^. tileID, t)) <$> tiles
+corners :: Map TileID Tile -> [Tile]
+corners tiles = Unsafe.fromJust . (`lookup` tiles) <$> keys (Map.filter ((== 2) . sum . fmap (fromEnum . null)) (matchingBorders tiles))
 
-    tileEdges :: Map TileID (Sides Edge)
-    tileEdges = edges <$> tileMap
-
-    tileEdgeMatches :: Map TileID (Sides (Set TileID))
-    tileEdgeMatches = tracePrefix "tileEdgeMatches" $ mapWithKey tileToMatches tileEdges
-      where
-        tileToMatches :: TileID -> Sides Edge -> Sides (Set TileID)
-        tileToMatches tID = fmap (`edgeMatches` delete tID tileEdges)
-
-        -- Collect a set of tiles that this edge could possibly align with.
-        edgeMatches :: Edge -> Map TileID (Sides Edge) -> Set TileID
-        edgeMatches edge otherTiles =
-          foldrWithKey
-            ( \otherTileID otherTileEdges acc ->
-                if or $ align edge <$> otherTileEdges
-                  then Set.insert otherTileID acc
-                  else acc
-            )
-            mempty
-            otherTiles
-
-    cornerTiles :: [Tile]
-    cornerTiles = Unsafe.fromJust . (`lookup` tileMap) <$> keys (Map.filter ((== 2) . sum . fmap (fromEnum . null)) tileEdgeMatches)
-
--- 1. Start with a corner. WLOG, assume it's the correct orientation.
--- 2. For each edge, add the matching tile, making sure it's in the right
+-- 1. Start the top-left (i.e. the (0, 0)) a corner. WLOG, assume it's the correct orientation.
+-- 2. For each edge of the current tile, add the matching tile, making sure it's in the right
 -- orientation.
-
-reconstruct :: [Tile] -> Grid Tile
-reconstruct = undefined
+-- 3. DFS until the whole picture is complete.
+reconstruct :: Map TileID Tile -> Grid Tile
+reconstruct tiles = undefined
+  where
+    lookup' = Unsafe.fromJust . (`lookup` tiles)
+    matches = matchingBorders tiles
+    topLeftCornerTile = head $ unsafeNonEmpty $ fmap lookup' $ keys $ Map.filter (\sides -> null (top sides) && null (left sides)) matches
