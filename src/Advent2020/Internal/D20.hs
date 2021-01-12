@@ -1,6 +1,6 @@
 module Advent2020.Internal.D20
   ( Tile (..),
-    TileID,
+    TileID (..),
     tileID,
     tileGrid,
     showTile,
@@ -15,6 +15,7 @@ import Control.Lens (makeLenses, view)
 import Data.Map (foldrWithKey, mapWithKey)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
+import Data.Tree (Tree, unfoldForestM)
 import GHC.Show (Show (..))
 import Relude hiding (show)
 import Relude.Extra.Map
@@ -33,7 +34,8 @@ instance Show Pixel where
 
 type Edge = [Pixel]
 
-type TileID = Integer
+newtype TileID = TileID {unTileID :: Integer}
+  deriving (Show, Ord, Eq)
 
 data Tile = Tile
   { _tileID :: TileID,
@@ -46,7 +48,7 @@ $(makeLenses ''Tile)
 parse :: Text -> Either Text (Map TileID Tile)
 parse = parseWithPrettyErrors $ fromList <$> ((\t@Tile {..} -> (_tileID, t)) <<$>> tilesP)
   where
-    tileIDP = symbol "Tile" >> integralP <* symbol ":"
+    tileIDP = symbol "Tile" >> TileID <$> integralP <* symbol ":"
     blackP = Black <$ char '.'
     whiteP = White <$ char '#'
     pixelP = blackP <|> whiteP
@@ -98,8 +100,36 @@ corners tiles = Unsafe.fromJust . (`lookup` tiles) <$> keys (Map.filter ((== 2) 
 -- orientation.
 -- 3. DFS until the whole picture is complete.
 reconstruct :: Map TileID Tile -> Grid Tile
-reconstruct tiles = undefined
+reconstruct tiles = toGrid $ execState unfoldGrid $ one ((0, 0), topLeftCornerTile)
   where
+    lookup' :: TileID -> Tile
     lookup' = Unsafe.fromJust . (`lookup` tiles)
+
+    matches :: Map TileID (Sides (Set TileID))
     matches = matchingBorders tiles
+
+    topLeftCornerTile :: Tile
     topLeftCornerTile = head $ unsafeNonEmpty $ fmap lookup' $ keys $ Map.filter (\sides -> null (top sides) && null (left sides)) matches
+
+    toGrid :: Map (Int, Int) Tile -> Grid Tile
+    toGrid tileGridMap =
+      Grid
+        { _gridMap = tileGridMap,
+          _gridHeight = undefined,
+          _gridWidth = undefined
+        }
+
+    returningUnit :: (Monad m) => m a -> m ((), a)
+    returningUnit m = ((),) <$> m
+
+    unfoldGrid :: State (Map (Int, Int) Tile) [Tree ()]
+    unfoldGrid = unfoldForestM (returningUnit . f) [(0, 1), (1, 0)]
+
+    f :: (Int, Int) -> State (Map (Int, Int) Tile) [(Int, Int)]
+    f (x, y) = do
+      -- Get neighbors
+      -- For each neighbor:
+      -- If tile set in state map, ignore (assume correct -- maybe validate?)
+      -- Else, try to set tile in state map to tile's border match (if no matches exist, it's either an edge or corner)
+      -- Return list of coordinates of new matches that were not previously set to continue unfolding
+      undefined

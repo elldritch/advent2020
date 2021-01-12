@@ -3,7 +3,7 @@
 module Advent2020.D20Spec (spec) where
 
 import Advent2020.Internal (Grid (..))
-import Advent2020.Internal.D20 (Pixel (..), Tile (..), TileID, corners, parse, tileID)
+import Advent2020.Internal.D20 (Pixel (..), Tile (..), TileID (..), corners, parse, tileID)
 import Advent2020.Spec.Internal (shouldBe')
 import Relude
 import Relude.Extra.Lens
@@ -125,7 +125,7 @@ exampleTiles = fromList $ (\t@Tile {..} -> (_tileID, t)) <$> tiles
   where
     tiles =
       [ Tile
-          { _tileID = 2311,
+          { _tileID = TileID 2311,
             _tileGrid =
               Grid
                 { _gridHeight = 10,
@@ -236,7 +236,7 @@ exampleTiles = fromList $ (\t@Tile {..} -> (_tileID, t)) <$> tiles
                 }
           },
         Tile
-          { _tileID = 1951,
+          { _tileID = TileID 1951,
             _tileGrid =
               Grid
                 { _gridHeight = 10,
@@ -347,7 +347,7 @@ exampleTiles = fromList $ (\t@Tile {..} -> (_tileID, t)) <$> tiles
                 }
           },
         Tile
-          { _tileID = 1171,
+          { _tileID = TileID 1171,
             _tileGrid =
               Grid
                 { _gridHeight = 10,
@@ -458,7 +458,7 @@ exampleTiles = fromList $ (\t@Tile {..} -> (_tileID, t)) <$> tiles
                 }
           },
         Tile
-          { _tileID = 1427,
+          { _tileID = TileID 1427,
             _tileGrid =
               Grid
                 { _gridHeight = 10,
@@ -569,7 +569,7 @@ exampleTiles = fromList $ (\t@Tile {..} -> (_tileID, t)) <$> tiles
                 }
           },
         Tile
-          { _tileID = 1489,
+          { _tileID = TileID 1489,
             _tileGrid =
               Grid
                 { _gridHeight = 10,
@@ -680,7 +680,7 @@ exampleTiles = fromList $ (\t@Tile {..} -> (_tileID, t)) <$> tiles
                 }
           },
         Tile
-          { _tileID = 2473,
+          { _tileID = TileID 2473,
             _tileGrid =
               Grid
                 { _gridHeight = 10,
@@ -791,7 +791,7 @@ exampleTiles = fromList $ (\t@Tile {..} -> (_tileID, t)) <$> tiles
                 }
           },
         Tile
-          { _tileID = 2971,
+          { _tileID = TileID 2971,
             _tileGrid =
               Grid
                 { _gridHeight = 10,
@@ -902,7 +902,7 @@ exampleTiles = fromList $ (\t@Tile {..} -> (_tileID, t)) <$> tiles
                 }
           },
         Tile
-          { _tileID = 2729,
+          { _tileID = TileID 2729,
             _tileGrid =
               Grid
                 { _gridHeight = 10,
@@ -1013,7 +1013,7 @@ exampleTiles = fromList $ (\t@Tile {..} -> (_tileID, t)) <$> tiles
                 }
           },
         Tile
-          { _tileID = 3079,
+          { _tileID = TileID 3079,
             _tileGrid =
               Grid
                 { _gridHeight = 10,
@@ -1131,4 +1131,4 @@ spec = do
     parse exampleInput `shouldBe'` exampleTiles
 
   it "computes corner tiles" $ do
-    (^. tileID) <$> corners exampleTiles `shouldMatchList` [1951, 3079, 2971, 1171]
+    (^. tileID) <$> corners exampleTiles `shouldMatchList` (TileID <$> [1951, 3079, 2971, 1171])
