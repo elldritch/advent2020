@@ -12,7 +12,7 @@ module Advent2020.Internal.D20
   )
 where
 
-import Advent2020.Internal (Grid (..), Sides (..), edges, integralP, parseGrid, parseWithPrettyErrors, showGrid, symbol, unsafeNonEmpty)
+import Advent2020.Internal (Grid (..), Position, Sides (..), edges, integralP, parseGrid, parseWithPrettyErrors, showGrid, symbol, unsafeNonEmpty)
 import Control.Lens (makeLenses, view)
 import Data.Map (foldrWithKey, mapWithKey)
 import qualified Data.Map as Map
@@ -115,7 +115,7 @@ reconstruct tiles = toGrid $ execState unfoldGrid $ one ((0, 0), topLeftCornerTi
     topLeftCornerTile :: Tile
     topLeftCornerTile = head $ unsafeNonEmpty $ fmap lookup' $ keys $ Map.filter (\sides -> null (top sides) && null (left sides)) matches
 
-    toGrid :: Map (Int, Int) Tile -> Grid Tile
+    toGrid :: Map Position Tile -> Grid Tile
     toGrid tileGridMap =
       Grid
         { _gridMap = tileGridMap,
@@ -128,18 +128,20 @@ reconstruct tiles = toGrid $ execState unfoldGrid $ one ((0, 0), topLeftCornerTi
     returningUnit :: (Monad m) => m a -> m ((), a)
     returningUnit m = ((),) <$> m
 
-    unfoldGrid :: State (Map (Int, Int) Tile) [Tree ()]
+    unfoldGrid :: State (Map Position Tile) [Tree ()]
     unfoldGrid = unfoldForestM (returningUnit . f) [(0, 1), (1, 0)]
 
-    f :: (Int, Int) -> State (Map (Int, Int) Tile) [(Int, Int)]
+    f :: Position -> State (Map Position Tile) [Position]
     f (x, y) = do
-      -- Get neighbors
       tileMap <- get
-      let ns = undefined
+      let tile = Unsafe.fromJust $ lookup (x, y) tileMap
+      let Sides {..} = Unsafe.fromJust $ lookup (view tileID tile) matches
+      let t1 = tileMap `Map.union` (if null top then mempty else one ((x, y - 1), lookup' $ head $ unsafeNonEmpty $ toList top))
+
+      -- Get neighbors
       -- For each neighbor:
       -- If tile set in state map, ignore (assume correct -- maybe validate?)
-      -- Else, try to set tile in state map to tile's border match (if no matches exist, it's either an edge or corner)
+      -- Else, try to set tile in state map to tile's border match by rotating to match (if no matches exist, it's either an edge or corner)
+
       -- Return list of coordinates of new matches that were not previously set to continue unfolding
       undefined
-      where
-        neighborCoords = [(x + dx, y + dy) | dx <- [-1, 0, 1], dy <- [-1, 0, 1]]
