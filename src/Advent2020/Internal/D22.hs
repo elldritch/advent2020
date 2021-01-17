@@ -3,11 +3,9 @@ module Advent2020.Internal.D22
     Game,
     Player (..),
     parse,
-    step,
     play,
-    score,
-    step',
     play',
+    score,
   )
 where
 
