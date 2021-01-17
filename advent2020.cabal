@@ -4,7 +4,7 @@ version:       0.1.0.0
 build-type:    Simple
 
 common lang
-  build-depends:      base >=4.13 && <4.14
+  build-depends:      base ^>=4.13
   default-language:   Haskell2010
   default-extensions:
     NoImplicitPrelude
@@ -55,6 +55,7 @@ library
     Advent2020.D19
     Advent2020.D2
     Advent2020.D20
+    Advent2020.D22
     Advent2020.D3
     Advent2020.D4
     Advent2020.D5
@@ -75,6 +76,7 @@ library
     Advent2020.Internal.D19
     Advent2020.Internal.D2
     Advent2020.Internal.D20
+    Advent2020.Internal.D22
     Advent2020.Internal.D3
     Advent2020.Internal.D4
     Advent2020.Internal.D5
@@ -98,6 +100,7 @@ library
     , megaparsec          ==9.0.1
     , parser-combinators  ==1.2.1
     , text                ==1.2.4.0
+    , transformers        ==0.5.6.2
 
 test-suite tests
   import:         lang
@@ -119,6 +122,7 @@ test-suite tests
     Advent2020.D19Spec
     Advent2020.D1Spec
     Advent2020.D20Spec
+    Advent2020.D22Spec
     Advent2020.D2Spec
     Advent2020.D3Spec
     Advent2020.D4Spec

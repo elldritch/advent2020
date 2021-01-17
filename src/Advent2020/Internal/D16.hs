@@ -43,7 +43,7 @@ parse = parseWithPrettyErrors $ do
   _ <- newline
   _ <- symbol "nearby tickets:\n"
   others <- ticketP `NonEmpty.sepEndBy1` newline
-  _ <- eof
+  eof
   return (fromList rules, mine, others)
   where
     ruleP :: Parser (FieldName, [Range])

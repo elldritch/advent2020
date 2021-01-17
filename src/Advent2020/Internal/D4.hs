@@ -109,7 +109,7 @@ validateHeight = parseWithSimpleError "height" heightParser
     heightParser = do
       value <- integralP
       units <- wordP
-      _ <- eof
+      eof
       case units of
         "in" -> Inches <$> validateNumber (59, 75) "inches" value
         "cm" -> Centimeters <$> validateNumber (150, 193) "cm" value
@@ -121,7 +121,7 @@ validateHairColor = parseWithSimpleError "hair color" hairColorParser
     hairColorParser = do
       _ <- char '#'
       s <- count 6 hexDigitChar
-      _ <- eof
+      eof
       return s
 
 validateEyeColor :: Text -> Either Text Color
