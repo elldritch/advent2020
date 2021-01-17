@@ -2,8 +2,9 @@ module Advent2020.Internal.D5
   ( Partition (..),
     SeatSpec,
     parse,
-    Position (..),
-    specToPosition,
+    Seat,
+    SeatPosition (..),
+    parseSpec,
     seatID,
   )
 where
@@ -32,7 +33,7 @@ parse = parseWithPrettyErrors $ specParser `NonEmpty.sepEndBy1` newline <* eof
       ys <- count 3 $ (L <$ char 'L') <|> (R <$ char 'R')
       return $ xs <> ys
 
-data Position t = Position
+data SeatPosition t = SeatPosition
   { row :: t,
     column :: t
   }
@@ -40,25 +41,27 @@ data Position t = Position
 
 type Range = (Int, Int) -- Inclusive on lower bound, exclusive on higher bound.
 
-specToPosition :: SeatSpec -> Either Text (Position Int)
-specToPosition spec = do
-  let Position {..} = foldl' narrowRange seatRange spec
+type Seat = SeatPosition Int
+
+parseSpec :: SeatSpec -> Either Text Seat
+parseSpec spec = do
+  let SeatPosition {..} = foldl' narrowRange seatRange spec
   row' <- rangeToInt row
   col' <- rangeToInt column
-  return Position {row = row', column = col'}
+  return SeatPosition {row = row', column = col'}
   where
-    seatRange :: Position Range
+    seatRange :: SeatPosition Range
     seatRange =
-      Position
+      SeatPosition
         { row = (0, 128),
           column = (0, 8)
         }
 
-    narrowRange :: Position Range -> Partition -> Position Range
-    narrowRange p@Position {row = (low, high)} F = p {row = (low, high - narrow low high)}
-    narrowRange p@Position {row = (low, high)} B = p {row = (low + narrow low high, high)}
-    narrowRange p@Position {column = (low, high)} L = p {column = (low, high - narrow low high)}
-    narrowRange p@Position {column = (low, high)} R = p {column = (low + narrow low high, high)}
+    narrowRange :: SeatPosition Range -> Partition -> SeatPosition Range
+    narrowRange p@SeatPosition {row = (low, high)} F = p {row = (low, high - narrow low high)}
+    narrowRange p@SeatPosition {row = (low, high)} B = p {row = (low + narrow low high, high)}
+    narrowRange p@SeatPosition {column = (low, high)} L = p {column = (low, high - narrow low high)}
+    narrowRange p@SeatPosition {column = (low, high)} R = p {column = (low + narrow low high, high)}
 
     narrow :: Int -> Int -> Int
     narrow low high = (high - low) `div` 2
@@ -69,5 +72,5 @@ specToPosition spec = do
         then Right low
         else Left $ "invalid: attempted to turn range " <> show r <> " into integer"
 
-seatID :: Position Int -> Int
-seatID Position {..} = row * 8 + column
+seatID :: Seat -> Int
+seatID SeatPosition {..} = row * 8 + column

@@ -7,17 +7,26 @@ module Advent2020.Internal.Grid
     showGrid,
     Sides (..),
     edges,
+    Position,
+    neighbors,
   )
 where
 
 import Advent2020.Internal.Parse (Parser)
 import Control.Lens (makeLenses, over, view, (^.))
 import qualified Control.Monad.Combinators.NonEmpty as NonEmpty
-import Data.List (groupBy)
+import Data.List (delete, groupBy)
 import Data.Map (assocs, lookup, mapKeys)
 import Relude
 import qualified Relude.Unsafe as Unsafe
 import Text.Megaparsec.Char (newline)
+
+-- | A 2-coordinate for specifying a grid location.
+type Position = (Int, Int)
+
+-- | Get all neighbors of a point.
+neighbors :: Position -> [Position]
+neighbors (x, y) = delete (x, y) [(x + dx, y + dy) | dx <- [-1, 0, 1], dy <- [-1, 0, 1]]
 
 -- | A rectangular grid of @t@.
 data Grid t = Grid
@@ -29,6 +38,8 @@ data Grid t = Grid
 
 $(makeLenses ''Grid)
 
+-- | Pretty-print a grid, assuming the @'Show'@ instance of every cell is one
+-- line and the same width.
 showGrid :: Show a => Grid a -> Text
 showGrid g = unlines $ toText <$> ls
   where

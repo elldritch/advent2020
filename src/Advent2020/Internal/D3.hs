@@ -6,7 +6,7 @@ module Advent2020.Internal.D3
   )
 where
 
-import Advent2020.Internal (Grid (..), gridHeight, gridMap, gridWidth, parseGrid, parseWithPrettyErrors)
+import Advent2020.Internal (Grid (..), Position, gridHeight, gridMap, gridWidth, parseGrid, parseWithPrettyErrors)
 import GHC.Show (Show (..))
 import Relude hiding (show)
 import Relude.Extra.Lens
@@ -30,7 +30,7 @@ parse = parseWithPrettyErrors $ parseGrid squareP <* eof
     treeP = Tree <$ char '#'
     squareP = openP <|> treeP
 
-squareAt :: Grid Square -> (Int, Int) -> Either Text Square
+squareAt :: Grid Square -> Position -> Either Text Square
 squareAt g (x, y) = maybeToRight ("squareAt: invalid map square: " <> toText (show (x, y))) $ lookup (x', y) $ g ^. gridMap
   where
     x' = x `mod` g ^. gridWidth
@@ -40,7 +40,7 @@ data Slope = Slope
     down :: Int
   }
 
-slopePath :: Slope -> [(Int, Int)]
+slopePath :: Slope -> [Position]
 slopePath Slope {..} = iterate move (0, 0)
   where
     move (x, y) = (x + right, y + down)

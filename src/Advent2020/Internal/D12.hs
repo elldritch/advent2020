@@ -13,7 +13,7 @@ module Advent2020.Internal.D12
   )
 where
 
-import Advent2020.Internal (Parser, integralP, parseWithPrettyErrors)
+import Advent2020.Internal (Parser, Position, integralP, parseWithPrettyErrors)
 import Relude
 import Text.Megaparsec (eof, sepEndBy1)
 import Text.Megaparsec.Char (char, newline)
@@ -60,8 +60,6 @@ parse = parseWithPrettyErrors $ (moveP <|> turnP) `sepEndBy1` newline <* eof
       action <- (Turn DLeft <$ char 'L') <|> (Turn DRight <$ char 'R')
       value <- integralP
       return Instruction {..}
-
-type Position = (Int, Int)
 
 data Ship = Ship
   { orientation :: Orientation,

@@ -1,6 +1,6 @@
 module Advent2020.D17Spec (spec) where
 
-import Advent2020.Internal.D17 (Hyperposition, Pocket (..), Position, numCubes, parse, parse', stepN, stepN')
+import Advent2020.Internal.D17 (Cube, Hypercube, Pocket (..), numCubes, parse, parse', stepN, stepN')
 import Advent2020.Spec.Internal (shouldBe')
 import Relude
 import Test.Hspec (Spec, describe, it, shouldBe)
@@ -13,7 +13,7 @@ exampleInput =
       "###"
     ]
 
-examplePocket :: Pocket Position
+examplePocket :: Pocket Cube
 examplePocket = Pocket $ fromList $ (\(x, y) -> (x, y, 0)) <$> actives
   where
     actives =
@@ -24,7 +24,7 @@ examplePocket = Pocket $ fromList $ (\(x, y) -> (x, y, 0)) <$> actives
         (2, 2)
       ]
 
-exampleHyperpocket :: Pocket Hyperposition
+exampleHyperpocket :: Pocket Hypercube
 exampleHyperpocket = Pocket $ fromList $ (\(x, y) -> (x, y, 0, 0)) <$> actives
   where
     actives =

@@ -1,11 +1,11 @@
 module Advent2020.Internal.D17
   ( Pocket (..),
     numCubes,
-    Position,
+    Cube,
     parse,
     step,
     stepN,
-    Hyperposition,
+    Hypercube,
     parse',
     step',
     stepN',
@@ -21,9 +21,9 @@ import Relude.Extra.Map
 import Text.Megaparsec (eof)
 import Text.Megaparsec.Char (char)
 
-type Position = (Int, Int, Int)
+type Cube = (Int, Int, Int)
 
-type Hyperposition = (Int, Int, Int, Int)
+type Hypercube = (Int, Int, Int, Int)
 
 newtype Pocket t = Pocket {activeCubes :: Set t}
   deriving (Show, Eq)
@@ -41,10 +41,10 @@ parse_ interpretPosition = parseWithPrettyErrors $ do
     inactiveP = False <$ char '.'
     cubeP = activeP <|> inactiveP
 
-parse :: Text -> Either Text (Pocket Position)
+parse :: Text -> Either Text (Pocket Cube)
 parse = parse_ $ \(x, y) -> (x, y, 0)
 
-parse' :: Text -> Either Text (Pocket Hyperposition)
+parse' :: Text -> Either Text (Pocket Hypercube)
 parse' = parse_ $ \(x, y) -> (x, y, 0, 0)
 
 step_ :: (Ord t) => (t -> [t]) -> Pocket t -> Pocket t
@@ -65,7 +65,7 @@ stepPosition neighbors (Pocket actives) position
     isActive = position `member` actives
     activeNeighbors = length $ filter (`member` actives) $ neighbors position
 
-neighborsOf :: Position -> [Position]
+neighborsOf :: Cube -> [Cube]
 neighborsOf (x, y, z) =
   List.delete
     (x, y, z)
@@ -75,7 +75,7 @@ neighborsOf (x, y, z) =
         dz <- [-1, 0, 1]
     ]
 
-hyperNeighborsOf :: Hyperposition -> [Hyperposition]
+hyperNeighborsOf :: Hypercube -> [Hypercube]
 hyperNeighborsOf (x, y, z, w) =
   List.delete
     (x, y, z, w)
@@ -86,17 +86,17 @@ hyperNeighborsOf (x, y, z, w) =
         dw <- [-1, 0, 1]
     ]
 
-step :: Pocket Position -> Pocket Position
+step :: Pocket Cube -> Pocket Cube
 step = step_ neighborsOf
 
-step' :: Pocket Hyperposition -> Pocket Hyperposition
+step' :: Pocket Hypercube -> Pocket Hypercube
 step' = step_ hyperNeighborsOf
 
 stepN_ :: (Pocket t -> Pocket t) -> Int -> Pocket t -> Pocket t
 stepN_ stepper n = head . unsafeNonEmpty . drop n . iterate stepper
 
-stepN :: Int -> Pocket Position -> Pocket Position
+stepN :: Int -> Pocket Cube -> Pocket Cube
 stepN = stepN_ step
 
-stepN' :: Int -> Pocket Hyperposition -> Pocket Hyperposition
+stepN' :: Int -> Pocket Hypercube -> Pocket Hypercube
 stepN' = stepN_ step'

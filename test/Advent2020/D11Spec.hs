@@ -1,7 +1,7 @@
 module Advent2020.D11Spec (spec) where
 
 import Advent2020.Internal (fixed, gridMap)
-import Advent2020.Internal.D11 (Grid (..), Position (..), adjacent, firstVisibleSeat, parse, step)
+import Advent2020.Internal.D11 (Grid (..), Square (..), adjacent, firstVisibleSeat, parse, step)
 import Advent2020.Spec.Internal (shouldBe')
 import Relude
 import Relude.Extra.Lens
@@ -22,7 +22,7 @@ exampleInput =
       "L.LLLLL.LL"
     ]
 
-exampleGrid :: Grid Position
+exampleGrid :: Grid Square
 exampleGrid =
   Grid
     { _gridHeight = 10,
@@ -166,7 +166,7 @@ exampleInput4 =
       ".##.##."
     ]
 
-visible :: Text -> (Int, Int) -> Either Text [Position]
+visible :: Text -> (Int, Int) -> Either Text [Square]
 visible input seat = parse input <&> (`firstVisibleSeat` seat)
 
 spec :: Spec

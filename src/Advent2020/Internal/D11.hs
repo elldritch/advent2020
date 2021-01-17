@@ -1,6 +1,6 @@
 module Advent2020.Internal.D11
   ( Grid (..),
-    Position (..),
+    Square (..),
     parse,
     step,
     adjacent,
@@ -8,7 +8,7 @@ module Advent2020.Internal.D11
   )
 where
 
-import Advent2020.Internal (Grid (..), gridMap, parseGrid, parseWithPrettyErrors)
+import Advent2020.Internal (Grid (..), Position, gridMap, neighbors, parseGrid, parseWithPrettyErrors)
 import Control.Lens (over, (^.))
 import Data.List (delete)
 import Data.Map (lookup, mapWithKey)
@@ -17,18 +17,18 @@ import Relude hiding (show)
 import Text.Megaparsec (eof)
 import Text.Megaparsec.Char (char)
 
-data Position
+data Square
   = Floor
   | Empty
   | Occupied
   deriving (Eq)
 
-instance Show Position where
+instance Show Square where
   show Floor = "."
   show Empty = "L"
   show Occupied = "#"
 
-parse :: Text -> Either Text (Grid Position)
+parse :: Text -> Either Text (Grid Square)
 parse = parseWithPrettyErrors $ parseGrid cell <* eof
   where
     floorP = Floor <$ char '.'
@@ -36,28 +36,26 @@ parse = parseWithPrettyErrors $ parseGrid cell <* eof
     occupiedP = Occupied <$ char '#'
     cell = floorP <|> emptyP <|> occupiedP
 
-adjacent :: Grid Position -> (Int, Int) -> [Position]
-adjacent g (x, y) = catMaybes $ (`lookup` (g ^. gridMap)) <$> neighbors
-  where
-    neighbors = delete (x, y) [(x + a, y + b) | a <- [-1, 0, 1], b <- [-1, 0, 1]]
+adjacent :: Grid Square -> Position -> [Square]
+adjacent g (x, y) = catMaybes $ (`lookup` (g ^. gridMap)) <$> neighbors (x, y)
 
-firstVisibleSeat :: Grid Position -> (Int, Int) -> [Position]
-firstVisibleSeat g (x, y) = catMaybes $ firstSeatInVector <$> vectors
+firstVisibleSeat :: Grid Square -> Position -> [Square]
+firstVisibleSeat g (x, y) = catMaybes $ firstSeatInVector <$> outwards
   where
-    vectors = delete (0, 0) [(a, b) | a <- [-1, 0, 1], b <- [-1, 0, 1]]
+    outwards = delete (0, 0) [(a, b) | a <- [-1, 0, 1], b <- [-1, 0, 1]]
 
-    outwardCells (dx, dy) = delete (x, y) (iterate (\(x', y') -> (x' + dx, y' + dy)) (x, y))
+    inDirection (dx, dy) = delete (x, y) (iterate (\(x', y') -> (x' + dx, y' + dy)) (x, y))
 
     firstSeatInVector vec =
-      find (/= Floor) $ catMaybes $ takeWhile isJust ((`lookup` (g ^. gridMap)) <$> outwardCells vec)
+      find (/= Floor) $ catMaybes $ takeWhile isJust ((`lookup` (g ^. gridMap)) <$> inDirection vec)
 
-step :: (Grid Position -> (Int, Int) -> [Position]) -> Int -> Grid Position -> Grid Position
-step getNeighbors maxNeighbors g = over gridMap (mapWithKey stepPosition) g
+step :: (Grid Square -> Position -> [Square]) -> Int -> Grid Square -> Grid Square
+step getNeighbors maxNeighbors g = over gridMap (mapWithKey f) g
   where
-    stepPosition :: (Int, Int) -> Position -> Position
-    stepPosition coordinate position
-      | position == Empty && null neighbors = Occupied
-      | position == Occupied && length neighbors >= maxNeighbors = Empty
-      | otherwise = position
+    f :: Position -> Square -> Square
+    f p s
+      | s == Empty && null ns = Occupied
+      | s == Occupied && length ns >= maxNeighbors = Empty
+      | otherwise = s
       where
-        neighbors = filter (== Occupied) $ getNeighbors g coordinate
+        ns = filter (== Occupied) $ getNeighbors g p

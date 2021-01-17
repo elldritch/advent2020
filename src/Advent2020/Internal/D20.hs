@@ -7,6 +7,8 @@ module Advent2020.Internal.D20
     Pixel (..),
     parse,
     corners,
+    Image,
+    reconstruct,
   )
 where
 
@@ -95,11 +97,13 @@ matchingBorders tiles = mapWithKey tileToMatches tileEdges
 corners :: Map TileID Tile -> [Tile]
 corners tiles = Unsafe.fromJust . (`lookup` tiles) <$> keys (Map.filter ((== 2) . sum . fmap (fromEnum . null)) (matchingBorders tiles))
 
+type Image = Grid Tile
+
 -- 1. Start the top-left (i.e. the (0, 0)) a corner. WLOG, assume it's the correct orientation.
 -- 2. For each edge of the current tile, add the matching tile, making sure it's in the right
 -- orientation.
 -- 3. DFS until the whole picture is complete.
-reconstruct :: Map TileID Tile -> Grid Tile
+reconstruct :: Map TileID Tile -> Image
 reconstruct tiles = toGrid $ execState unfoldGrid $ one ((0, 0), topLeftCornerTile)
   where
     lookup' :: TileID -> Tile
@@ -115,9 +119,11 @@ reconstruct tiles = toGrid $ execState unfoldGrid $ one ((0, 0), topLeftCornerTi
     toGrid tileGridMap =
       Grid
         { _gridMap = tileGridMap,
-          _gridHeight = undefined,
-          _gridWidth = undefined
+          _gridHeight = maxCoord fst,
+          _gridWidth = maxCoord snd
         }
+      where
+        maxCoord select = foldrWithKey (\coord _ acc -> max acc (select coord)) 0 tileGridMap
 
     returningUnit :: (Monad m) => m a -> m ((), a)
     returningUnit m = ((),) <$> m
@@ -128,8 +134,12 @@ reconstruct tiles = toGrid $ execState unfoldGrid $ one ((0, 0), topLeftCornerTi
     f :: (Int, Int) -> State (Map (Int, Int) Tile) [(Int, Int)]
     f (x, y) = do
       -- Get neighbors
+      tileMap <- get
+      let ns = undefined
       -- For each neighbor:
       -- If tile set in state map, ignore (assume correct -- maybe validate?)
       -- Else, try to set tile in state map to tile's border match (if no matches exist, it's either an edge or corner)
       -- Return list of coordinates of new matches that were not previously set to continue unfolding
       undefined
+      where
+        neighborCoords = [(x + dx, y + dy) | dx <- [-1, 0, 1], dy <- [-1, 0, 1]]

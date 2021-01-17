@@ -1,6 +1,6 @@
 module Advent2020.D5Spec (spec) where
 
-import Advent2020.Internal.D5 (Partition (..), Position (..), SeatSpec, parse, seatID, specToPosition)
+import Advent2020.Internal.D5 (Partition (..), Seat, SeatPosition (..), SeatSpec, parse, parseSpec, seatID)
 import Advent2020.Spec.Internal (shouldBe')
 import Relude
 import Test.Hspec (Spec, it, shouldBe)
@@ -22,12 +22,12 @@ exampleSeatSpecs =
          [B, B, F, F, B, B, F, R, L, L]
        ]
 
-exampleSeatPositions :: [Position Int]
+exampleSeatPositions :: [Seat]
 exampleSeatPositions =
-  [ Position {row = 44, column = 5},
-    Position {row = 70, column = 7},
-    Position {row = 14, column = 7},
-    Position {row = 102, column = 4}
+  [ SeatPosition {row = 44, column = 5},
+    SeatPosition {row = 70, column = 7},
+    SeatPosition {row = 14, column = 7},
+    SeatPosition {row = 102, column = 4}
   ]
 
 exampleSeatIDs :: [Int]
@@ -39,7 +39,7 @@ spec = do
     parse exampleInput `shouldBe'` exampleSeatSpecs
 
   it "computes seat positions from specs" $ do
-    sequence (toList $ specToPosition <$> exampleSeatSpecs) `shouldBe'` exampleSeatPositions
+    sequence (toList $ parseSpec <$> exampleSeatSpecs) `shouldBe'` exampleSeatPositions
 
   it "computes seat IDs from positions" $ do
     seatID <$> exampleSeatPositions `shouldBe` exampleSeatIDs
