@@ -5,6 +5,7 @@ module Advent2020.Internal.List
     smallest,
     largest,
     unsafeNonEmpty,
+    rotate,
   )
 where
 
@@ -37,3 +38,8 @@ largest xs = foldr max (head xs) xs
 -- | Transform a list into its nonempty equivalent. Only use when safe by construction.
 unsafeNonEmpty :: [a] -> NonEmpty a
 unsafeNonEmpty = Unsafe.fromJust . nonEmpty
+
+rotate :: Int -> [a] -> [a]
+rotate n xs = take l . drop (n `mod` l) . cycle $ xs
+  where
+    l = length xs
