@@ -14,6 +14,7 @@ import qualified Advent2020.D19 as D19
 import qualified Advent2020.D2 as D2
 import qualified Advent2020.D20 as D20
 import qualified Advent2020.D22 as D22
+import qualified Advent2020.D23 as D23
 import qualified Advent2020.D3 as D3
 import qualified Advent2020.D4 as D4
 import qualified Advent2020.D5 as D5
@@ -134,6 +135,10 @@ main = do
       22 -> case part of
         1 -> runEitherPretty $ D22.run D22.part1
         2 -> runEitherPretty $ D22.run D22.part2
+        _ -> catchAll
+      23 -> case part of
+        1 -> runEitherPretty $ D23.run D23.part1
+        -- 2 -> runEitherPretty $ D23.run D23.part2
         _ -> catchAll
       _ -> catchAll
 

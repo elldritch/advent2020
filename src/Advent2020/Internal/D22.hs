@@ -9,7 +9,7 @@ module Advent2020.Internal.D22
   )
 where
 
-import Advent2020.Internal (tracePrefix, integralP, parseWithPrettyErrors, symbol, unsafeNonEmpty)
+import Advent2020.Internal (integralP, parseWithPrettyErrors, symbol, unsafeNonEmpty)
 import Control.Monad.Combinators.NonEmpty (some)
 import Data.Set (insert, member)
 import Data.Tuple.Extra (both)
